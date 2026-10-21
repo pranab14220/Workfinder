@@ -413,7 +413,7 @@ display:flex;
 <div class="sidebar" id="sidebar">
 
 
-  <a href="http://workfinder108.lovestoblog.com/" class="active">
+  <a href="https://pranab14220.github.io/Workfinder/" class="active">
     <i class="fas fa-home"></i> Home
   </a>
 
@@ -768,131 +768,148 @@ function fill(id, map){
 }
 
 async function loadJobs(){
-  const querySnapshot = await getDocs(collection(db, "jobs"));
+  try {
+    const querySnapshot = await getDocs(collection(db, "jobs"));
 
-  let html = "";
+    let html = "";
+    let hasJobs = false;
 
-  querySnapshot.forEach(doc=>{
-    let job = doc.data();
+    querySnapshot.forEach(doc=>{
+      let job = doc.data();
 
-    // ✅ MAP DATA
-    add(states, job["State"]);
-    add(cities, job["City"]);
-    add(areas, job["Area"]);
-    add(jobTypes, job["Job Type"]);
-    add(workTypes, job["Work Type"]);
-    add(modes, job["Working Mode"]);
-    add(shifts, job["Working Shifts"]);
-    add(genders, job["Gender"]);
-    add(educations, job["Education"]);
+      // ✅ MAP DATA
+      add(states, job["State"]);
+      add(cities, job["City"]);
+      add(areas, job["Area"]);
+      add(jobTypes, job["Job Type"]);
+      add(workTypes, job["Work Type"]);
+      add(modes, job["Working Mode"]);
+      add(shifts, job["Working Shifts"]);
+      add(genders, job["Gender"]);
+      add(educations, job["Education"]);
 
-    let status = (job.status || "").toLowerCase();
-    if(status !== "approved") return;
+      let status = (job.status || "").toLowerCase();
+      if(status !== "approved") return;
 
-    html += `
-    <div class="job job-card" id="job-\( {doc.id}" data-id=" \){doc.id}">
+      hasJobs = true;
 
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div class="title">${job["Job Title"]}</div>
+      html += `
+      <div class="job job-card" id="job-\( {doc.id}" data-id=" \){doc.id}">
 
-        <div style="display:flex; gap:10px;">
-          <i class="fa-regular fa-bookmark saveBtn"
-             onclick="toggleSave('${doc.id}', this)"></i>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="title">${job["Job Title"]}</div>
 
-          <i class="fa-solid fa-share-nodes shareBtn"
-             onclick="shareJob('\( {doc.id}', ' \){job["Job Title"]}')"></i>
+          <div style="display:flex; gap:10px;">
+            <i class="fa-regular fa-bookmark saveBtn"
+               onclick="toggleSave('${doc.id}', this)"></i>
+
+            <i class="fa-solid fa-share-nodes shareBtn"
+               onclick="shareJob('\( {doc.id}', ' \){job["Job Title"]}')"></i>
+          </div>
         </div>
+
+        <div class="company">${job["Company Name"]}</div>
+
+        <div class="salary">
+          ₹ ${job["Salary"] || "Not Disclosed"}
+        </div>
+
+        <div class="spacing"><b>Job Type:</b> ${job["Job Type"] || "-"}</div><br>
+
+        <div class="spacing location">
+          <i class="fa-solid fa-location-dot"></i>
+          <b>Location:</b> 
+          ${job["Area"] || "-"}, ${job["City"] || "-"}, ${job["State"] || "-"}
+        </div>
+
+        <div class="spacing location">
+          <i class="fa-solid fa-map-pin"></i>
+          ${job["Landmark"] || "-"}
+        </div>
+
+        <div class="moreDetails" id="more-${doc.id}" style="display:none;">
+          <br>
+          <div class="spacing"><b>Work Type:</b> ${job["Work Type"] || "-"}</div>
+          <div class="spacing"><b>Work Mode:</b> ${job["Working Mode"] || "-"}</div>
+          <div class="spacing"><b>Shift:</b> ${job["Working Shifts"] || "-"}</div>
+          <br>
+
+          <div class="spacing"><b>Gender:</b> ${job["Gender"] || "-"}</div>
+          <div class="spacing"><b>Education:</b> ${job["Education"] || "-"}</div>
+          <div class="spacing"><b>Experience:</b> ${job["Experience"] || "-"}</div>
+
+          <div class="desc"><b>Description:</b> ${job["Job Description"] || "-"}</div><br>
+
+          \( {job["Contact Number"] ? `<a class="btn call" href="tel: \){job["Contact Number"]}"><i class="fa-solid fa-phone"></i></a>` : ""}
+          \( {job["WhatsApp"] ? `<a class="whats" href="https://wa.me/91 \){job["WhatsApp"]}" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>` : ""}
+          \( {job["Email"] ? `<a class="mail" href="mailto: \){job["Email"]}"><i class="fa-solid fa-envelope"></i></a>` : ""}
+        </div>
+
+        <button class="readBtn" onclick="toggleDetails('${doc.id}', this)">Read More</button>
       </div>
+      `;
+    });
 
-      <div class="company">${job["Company Name"]}</div>
+    // ✅ HTML INSERT
+    document.getElementById("jobs").innerHTML = html;
 
-      <div class="salary">
-        ₹ ${job["Salary"] || "Not Disclosed"}
-      </div>
+    // ❤️ RESTORE SAVED ICONS
+    let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
 
-      <div class="spacing"><b>Job Type:</b> ${job["Job Type"] || "-"}</div><br>
+    document.querySelectorAll(".job-card").forEach(card=>{
+      let id = card.getAttribute("data-id");
+      let icon = card.querySelector(".saveBtn");
 
-      <div class="spacing location">
-        <i class="fa-solid fa-location-dot"></i>
-        <b>Location:</b> 
-        ${job["Area"] || "-"}, ${job["City"] || "-"}, ${job["State"] || "-"}
-      </div>
-
-      <div class="spacing location">
-        <i class="fa-solid fa-map-pin"></i>
-        ${job["Landmark"] || "-"}
-      </div>
-
-      <div class="moreDetails" id="more-${doc.id}" style="display:none;">
-        <br>
-        <div class="spacing"><b>Work Type:</b> ${job["Work Type"] || "-"}</div>
-        <div class="spacing"><b>Work Mode:</b> ${job["Working Mode"] || "-"}</div>
-        <div class="spacing"><b>Shift:</b> ${job["Working Shifts"] || "-"}</div>
-        <br>
-
-        <div class="spacing"><b>Gender:</b> ${job["Gender"] || "-"}</div>
-        <div class="spacing"><b>Education:</b> ${job["Education"] || "-"}</div>
-        <div class="spacing"><b>Experience:</b> ${job["Experience"] || "-"}</div>
-
-        <div class="desc"><b>Description:</b> ${job["Job Description"] || "-"}</div><br>
-
-        \( {job["Contact Number"] ? `<a class="btn call" href="tel: \){job["Contact Number"]}"><i class="fa-solid fa-phone"></i></a>` : ""}
-        \( {job["WhatsApp"] ? `<a class="whats" href="https://wa.me/91 \){job["WhatsApp"]}" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>` : ""}
-        \( {job["Email"] ? `<a class="mail" href="mailto: \){job["Email"]}"><i class="fa-solid fa-envelope"></i></a>` : ""}
-      </div>
-
-      <button class="readBtn" onclick="toggleDetails('${doc.id}', this)">Read More</button>
-    </div>
-    `;
-  });
-
-  // ✅ HTML INSERT (FIXED POSITION)
-  document.getElementById("jobs").innerHTML = html;
-
-  // ❤️ RESTORE SAVED ICONS (FIXED)
-  let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
-
-  document.querySelectorAll(".job-card").forEach(card=>{
-    let id = card.getAttribute("data-id");
-    let icon = card.querySelector(".saveBtn");
-
-    if(savedJobs.includes(id)){
-      icon.classList.remove("fa-regular");
-      icon.classList.add("fa-solid");
-    }
-  });
-
-  
-
-  // 🔥 UPDATE COUNT
-  updateSavedCount();
-
-  // 🔥 AUTO SCROLL
-  setTimeout(()=>{
-    let hash = window.location.hash;
-    if(hash){
-      let target = document.querySelector(hash);
-      if(target){
-        target.scrollIntoView({ behavior: "smooth", block: "center" });
-        target.style.boxShadow = "0 0 0 3px #38bdf8";
-        setTimeout(()=>{ target.style.boxShadow = ""; }, 2000);
+      if(savedJobs.includes(id)){
+        icon.classList.remove("fa-regular");
+        icon.classList.add("fa-solid");
       }
+    });
+
+    updateSavedCount();
+
+    // 🔥 AUTO SCROLL
+    setTimeout(()=>{
+      let hash = window.location.hash;
+      if(hash){
+        let target = document.querySelector(hash);
+        if(target){
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+          target.style.boxShadow = "0 0 0 3px #38bdf8";
+          setTimeout(()=>{ target.style.boxShadow = ""; }, 2000);
+        }
+      }
+    }, 500);
+
+    // ✅ FILTERS
+    fill("filterState", states);
+    fill("filterCity", cities);
+    fill("filterArea", areas);
+    fill("filterJobType", jobTypes);
+    fill("filterWorkType", workTypes);
+    fill("filterMode", modes);
+    fill("filterShift", shifts);
+    fill("filterGender", genders);
+    fill("filterEducation", educations);
+
+    document.getElementById("skeleton").style.display="none";
+    document.getElementById("jobs").style.display="block";
+
+    // Agar koi job nahi mili
+    if(!hasJobs){
+      document.getElementById("noResults").style.display = "block";
+      document.getElementById("noResults").innerText = "No approved jobs found";
     }
-  }, 500);
 
-  // ✅ FILTERS
-  fill("filterState", states);
-  fill("filterCity", cities);
-  fill("filterArea", areas);
-  fill("filterJobType", jobTypes);
-  fill("filterWorkType", workTypes);
-  fill("filterMode", modes);
-  fill("filterShift", shifts);
-  fill("filterGender", genders);
-  fill("filterEducation", educations);
-
-  document.getElementById("skeleton").style.display="none";
-  document.getElementById("jobs").style.display="block";
+  } catch (error) {
+    console.error("Error loading jobs:", error);
+    document.getElementById("skeleton").innerHTML = `
+      <div style="padding:20px; color:red; text-align:center;">
+        ❌ Error loading jobs<br>
+        <small>${error.message}</small>
+      </div>
+    `;
+  }
 }
 
 loadJobs();

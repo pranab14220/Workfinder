@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Work Finder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  background:#e2e8f0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin:0;
+}
+
+/* 📱 APP CONTAINER */
+.app{
+  max-width:480px;
+  margin:auto;
+  background:#f8fafc;
+  min-height:100vh;
+}
+
+/* 🔥 HEADER (APP STYLE) */
+    
+.header{
+    
+    background:#0f172a;
+  color:white;
+  padding:18px;
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+  letter-spacing:0.5px;
+  position:sticky;
+  top:0;
+ z-index: 30;
+    
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* 🔍 SEARCH BOX */
+.search-box{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+.search-box i{
+  font-size:20px;
+  cursor:pointer;
+  z-index:2;
+}
+
+/* INPUT FIX */
+.search-box input{
+  width:0;
+  opacity:0;
+  padding:8px 0;
+  margin-right:8px;
+  border:none;
+  outline:none;
+  border-radius:20px;
+  transition:0.4s;
+}
+
+/* ACTIVE STATE */
+.search-box.active input{
+  width:180px;
+  opacity:1;
+  padding:8px 12px;
+}
+    
+    
+
+/* 📦 CONTAINER */
+.container{
+  padding:14px;
+}
+
+/* 💎 JOB CARD */
+.job{
+   background:white;
+  margin:16px 0;
+  padding:16px;
+  border-radius:14px;
+
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08),
+              0 2px 6px rgba(0, 0, 0, 0.05);
+
+  transition:0.2s;
+}
+
+/* ✨ TOUCH EFFECT */
+.job:active{
+  transform:scale(0.98);
+}
+
+/* 💼 TITLE */
+.title{
+  font-size:20px;
+  font-weight:700;
+  margin-bottom:6px;
+  color:#0f172a;
+}
+
+/* 🏢 COMPANY */
+.company{
+  font-size:15px;
+  color:#475569;
+  margin-bottom:10px;
+}
+
+/* 💰 SALARY */
+.salary{
+  font-size:18px;
+  font-weight:bold;
+  color:#16a34a;
+  margin:8px 0;
+}
+
+/* 📄 DETAILS */
+.spacing{
+  font-size:15px;
+  margin:6px 0;
+  color:#334155;
+}
+
+/* 📝 DESCRIPTION */
+.desc{
+  margin-top:30px;
+  font-size:14px;
+  color:#444;
+  line-height:1.5;
+}
+
+/* 🔘 BUTTONS */
+.btn, .whats, .mail{
+  display:inline-block;
+  margin:7px 5px 0 0;
+  padding:8px 8px 8px 12px;
+  border-radius:8px;
+  color:white;
+  text-decoration:none;
+  text-align:center;
+  font-size:17px;
+  font-weight:bold;
+}
+
+/* 🎨 BUTTON COLORS */
+.call{ background:#EB2543; }
+.whats{ background:#22c55e; }
+.mail{ background:#0ea5e9; }
+
+/* ICON SPACING */
+.btn i, .whats i, .mail i{
+  margin-right:6px;
+}
+
+/* 📱 MOBILE FONT BOOST */
+@media (max-width:600px){
+  .title{ font-size:21px; }
+  .spacing{ font-size:16px; }
+  .salary{ font-size:19px; }
+}
+
+
+
+
+.readBtn{
+  margin-top:10px;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:8px;
+  background:#0f172a;
+  color:white;
+  font-size:14px;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.readBtn:hover{
+  background:#1e293b;
+}
+
+
+.moreDetails{
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(5px);}
+  to{opacity:1; transform:translateY(0);}
+}
+  
+    
+.search-box.active i{
+  color:#38bdf8;
+}    
+  
+ 
+    
+    /* 🎨 filter bar and button */
+    
+ .filters{
+  display:flex;
+  align-items:center;
+  background:white;
+  position:sticky;
+  top:60px;
+  z-index:9;
+  padding:10px;
+  gap:8px;
+     align-items:center;
+}
+
+.filters select{
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  font-size:13px;
+}   
+    
+    
+    
+#filterIcon{
+  font-size:25px;
+  padding:6px;
+  background:#f1f5f9;
+  border-radius:6px;
+  cursor:pointer;
+  flex-shrink:0;
+    
+}
+
+#filterIcon.active{
+  color:#38bdf8;
+} 
+    
+    
+    .filter-icon-box{
+  display:flex;
+  align-items:center;
+}
+
+/* ✅ SCROLL ONLY FILTERS */
+.filter-scroll{
+display:flex;
+  gap:8px;
+  overflow-x:auto;
+  align-items:center;
+}
+  
+    
+    
+/* 🔥 MENU ICON */
+#menuBtn{
+  font-size:20px;
+  cursor:pointer;
+}
+
+/* 📱 SIDEBAR */
+.sidebar{
+  position:fixed;
+  top:0;
+  left:-240px;
+  width:220px;
+  height:100%;
+  background:#0f172a;
+  color:white;
+  transition:0.3s;
+  z-index:20;
+  display:flex;
+  flex-direction:column;
+    padding-top:100px;
+}
+
+/* 👤 PROFILE */
+.profile{
+  padding:20px;
+  text-align:center;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+.avatar{
+  font-size:30px;
+  margin-bottom:6px;
+}
+
+.name{
+  font-size:14px;
+  color:#cbd5f5;
+}
+
+/* 🔗 MENU ITEMS */
+.sidebar a{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 16px;
+  color:#cbd5f5;
+  text-decoration:none;
+  font-size:14px;
+  transition:0.2s;
+}
+
+.sidebar a i{
+  width:20px;
+  text-align:center;
+}
+
+/* HOVER */
+.sidebar a:hover{
+  background:#1e293b;
+  color:white;
+}
+
+/* ✅ ACTIVE ITEM */
+.sidebar a.active{
+  background:#38bdf8;
+  color:#0f172a;
+  font-weight:bold;
+  border-radius:0 20px 20px 0;
+}
+
+/* OPEN */
+.sidebar.active{
+  left:0;
+}
+    
+    
+/* 🔥 OVERLAY */
+#overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);   /* 🔥 main effect */
+  opacity:0;
+  pointer-events:none;
+  transition:0.3s;
+  z-index:15;
+}
+
+/* ACTIVE */
+#overlay.active{
+  opacity:1;
+  pointer-events:auto;
+}        
+    
+
+.badge{
+  background:red;
+  color:white;
+  font-size:11px;
+  padding:2px 6px;
+  border-radius:50px;
+  margin-left:6px;
+}    
+    
+    
+ .saveBtn{
+  font-size:20px;
+  cursor:pointer;
+  color:#64748b;
+}
+
+.saveBtn.fa-solid{
+ color:#f59e0b; /* 🔥 bookmark = yellow/orange feel */
+}   
+    
+ /* 🔥 Share */   
+    
+.shareBtn{
+  font-size:18px;
+  cursor:pointer;
+  color:#64748b;
+}
+
+.shareBtn:hover{
+  color:#0ea5e9;
+}    
+    
+    
+    
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    
+    <i class="fas fa-bars" id="menuBtn"></i>
+  <span>WorkFinder</span>
+
+  <div class="search-box">
+    <i class="fas fa-search" id="searchIcon"></i>
+    <input type="text" id="searchInput" placeholder="Search jobs...">
+  </div>
+</div>
+    
+    
+<div class="sidebar" id="sidebar">
+
+
+  <a href="http://workfinder108.lovestoblog.com/" class="active">
+    <i class="fas fa-home"></i> Home
+  </a>
+
+  
+<a href="#" onclick="showSavedJobs(); return false;" id="savedNav">
+  <i class="fas fa-bookmark"></i> Saved Jobs
+  <span id="savedCount" class="badge">0</span>
+</a>
+
+  <a href="#">
+    <i class="fas fa-bell"></i> Notifications
+  </a>
+
+  <a href="#">
+    <i class="fas fa-gear"></i> Settings
+  </a>
+
+</div>
+    
+ <div id="overlay"></div>   
+    
+    
+
+<div class="app">
+    
+   <div class="filters">
+
+  <div class="filter-icon-box">
+    <i class="fas fa-sliders-h" id="filterIcon"></i>
+  </div>
+
+  <!-- 🔥 IMPORTANT WRAPPER -->
+  <div class="filter-scroll">
+
+    <select id="filterJobType"><option value="">Job Type</option></select>
+    <select id="filterState"><option value="">State</option></select>
+    <select id="filterCity"><option value="">City</option></select>
+    <select id="filterArea"><option value="">Area</option></select>
+    <select id="filterWorkType"><option value="">Work Type</option></select>
+    <select id="filterMode"><option value="">Work Mode</option></select>
+    <select id="filterShift"><option value="">Shift</option></select>
+    <select id="filterGender"><option value="">Gender</option></select>
+    <select id="filterEducation"><option value="">Education</option></select>
+
+  </div>
+
+</div>
+    
+  <div id="skeleton">Loading jobs...</div>
+  <div class="container" id="jobs" style="display:none;"></div>
+    
+   <div id="noResults" style="display:none; text-align:center; padding:20px; color:#64748b;">
+  ❌ No jobs found
+</div> 
+    
+</div>
+   
+   
+   
+    
+
+ <script>
+     
+    const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+
+// 🔥 OPEN / CLOSE
+menuBtn.addEventListener("click", ()=>{
+  sidebar.classList.toggle("active");
+  overlay.classList.toggle("active");
+});
+
+// 🔥 CLICK OUTSIDE = CLOSE
+overlay.addEventListener("click", ()=>{
+  sidebar.classList.remove("active");
+  overlay.classList.remove("active");
+});
+  
+     
+     </script>
+
+<script>
+
+// 🔍 SEARCH SYSTEM FINAL (WORKING)
+
+const searchIcon = document.getElementById("searchIcon");
+const searchBox = document.querySelector(".search-box");
+const searchInput = document.getElementById("searchInput");
+const noResults = document.getElementById("noResults");
+
+// ✅ ICON CLICK (OPEN/CLOSE)
+searchIcon.addEventListener("click", () => {
+  searchBox.classList.toggle("active");
+
+  if(searchBox.classList.contains("active")){
+    searchInput.focus();
+  }else{
+    searchInput.value = "";
+    searchInput.dispatchEvent(new Event("keyup"));
+  }
+});
+
+// 🔥 SEARCH FILTER + NO RESULT
+searchInput.addEventListener("keyup", function () {
+  let value = this.value.toLowerCase();
+
+  let jobs = document.querySelectorAll(".job-card");
+  let found = false;
+
+  jobs.forEach(job => {
+    let text = job.innerText.toLowerCase();
+
+    if (text.includes(value)) {
+      job.style.display = "block";
+      found = true;
+    } else {
+      job.style.display = "none";
+    }
+  });
+
+  // ✅ NO RESULT MESSAGE
+  noResults.style.display = found ? "none" : "block";
+});
+     
+     
+     
+     const filters = document.querySelectorAll(".filters select");
+
+filters.forEach(select=>{
+  select.addEventListener("change", applyFilters);
+});
+     
+     
+     
+function shareJob(id, title){
+
+  let url = window.location.origin + window.location.pathname + "#job-" + id;
+
+  if(navigator.share){
+    // 📱 Mobile / modern browser
+    navigator.share({
+      title: title,
+      text: "Check this job:",
+      url: url
+    });
+  }else{
+    // 💻 Fallback (desktop)
+    navigator.clipboard.writeText(url);
+    alert("Link copied! Share anywhere 👍");
+  }
+} 
+     
+     
+     
+
+function applyFilters(){
+
+  let jobs = document.querySelectorAll(".job-card");
+  let found = false;
+
+  let fJob = document.getElementById("filterJobType").value.toLowerCase();
+  let fState = document.getElementById("filterState").value.toLowerCase();
+  let fCity = document.getElementById("filterCity").value.toLowerCase();
+  let fArea = document.getElementById("filterArea").value.toLowerCase();
+  let fWork = document.getElementById("filterWorkType").value.toLowerCase();
+  let fMode = document.getElementById("filterMode").value.toLowerCase();
+  let fShift = document.getElementById("filterShift").value.toLowerCase();
+  let fGender = document.getElementById("filterGender").value.toLowerCase();
+  let fEdu = document.getElementById("filterEducation").value.toLowerCase();
+
+  jobs.forEach(job=>{
+    let text = job.innerText.toLowerCase();
+
+    let match =
+      (!fJob || text.includes(fJob)) &&
+      (!fState || text.includes(fState)) &&
+      (!fCity || text.includes(fCity)) &&
+      (!fArea || text.includes(fArea)) &&
+      (!fWork || text.includes(fWork)) &&
+      (!fMode || text.includes(fMode)) &&
+      (!fShift || text.includes(fShift)) &&
+      (!fGender || text.includes(fGender)) &&
+      (!fEdu || text.includes(fEdu));
+
+    if(match){
+      job.style.display = "block";
+      found = true;
+    }else{
+      job.style.display = "none";
+    }
+  });
+
+  document.getElementById("noResults").style.display = found ? "none" : "block";
+    
+    checkFilters();
+}
+
+     
+const filterIcon = document.getElementById("filterIcon");
+
+// 🔍 CHECK FILTER ACTIVE
+function checkFilters(){
+  let selects = document.querySelectorAll(".filters select");
+  let active = false;
+
+  selects.forEach(sel=>{
+    if(sel.value !== "") active = true;
+  });
+
+  if(active){
+    filterIcon.classList.add("active");
+    filterIcon.classList.remove("fa-sliders-h");
+    filterIcon.classList.add("fa-rotate-left"); // reset icon
+  }else{
+    filterIcon.classList.remove("active");
+    filterIcon.classList.remove("fa-rotate-left");
+    filterIcon.classList.add("fa-sliders-h"); // filter icon
+  }
+}  
+     
+     
+     
+function updateSavedCount(){
+  let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
+  let count = savedJobs.length;
+
+  let badge = document.getElementById("savedCount");
+
+  badge.innerText = count;
+
+  // 🔥 hide if 0 (optional)
+  badge.style.display = count === 0 ? "none" : "inline-block";
+}     
+     
+     
+     
+     
+     
+     
+     filterIcon.addEventListener("click", ()=>{
+
+  if(filterIcon.classList.contains("fa-rotate-left")){
+
+    let selects = document.querySelectorAll(".filters select");
+
+    selects.forEach(sel=>{
+      sel.value = "";
+    });
+
+    applyFilters();
+  }
+
+});
+     
+     
+     
+let isSavedMode = false; // ✅ GLOBAL
+
+function showSavedJobs(){
+  isSavedMode = true;
+
+  applySavedFilter();
+}
+
+function applySavedFilter(){
+  let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
+  let jobs = document.querySelectorAll(".job-card");
+  let found = false;
+
+  jobs.forEach(job=>{
+    let id = job.getAttribute("data-id");
+
+    if(savedJobs.includes(id)){
+      job.style.display = "block";
+      found = true;
+    }else{
+      job.style.display = "none";
+    }
+  });
+
+  document.getElementById("noResults").style.display = found ? "none" : "block";
+}
+
+// 💾 LOCAL STORAGE
+let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
+
+// ❤️ TOGGLE SAVE
+window.toggleSave = function(id, icon){
+
+  if(savedJobs.includes(id)){
+    savedJobs = savedJobs.filter(jobId => jobId !== id);
+    icon.classList.remove("fa-solid");
+    icon.classList.add("fa-regular");
+  }else{
+    savedJobs.push(id);
+    icon.classList.remove("fa-regular");
+    icon.classList.add("fa-solid");
+  }
+
+  localStorage.setItem("savedJobs", JSON.stringify(savedJobs));
+  updateSavedCount();
+
+  // 🔥 agar saved page me ho → instant update
+  if(isSavedMode){
+    applySavedFilter();
+  }
+}
+     
+</script>
+    
+    
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCCBMrDXwhV8-2kz-FaMTYmLEODXRGNAdU",
+  authDomain: "workfinder2-a5f80.firebaseapp.com",
+  projectId: "workfinder2-a5f80",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ✅ MAPS (OUTSIDE)
+let states = new Map();
+let cities = new Map();
+let areas = new Map();
+let jobTypes = new Map();
+let workTypes = new Map();
+let modes = new Map();
+let shifts = new Map();
+let genders = new Map();
+let educations = new Map();
+
+// ✅ FUNCTIONS (OUTSIDE)
+function add(map, value){
+  if(!value) return;
+  let key = value.toLowerCase().trim();
+  if(!map.has(key)){
+    map.set(key, value);
+  }
+}
+
+function fill(id, map){
+  let select = document.getElementById(id);
+  map.forEach(val=>{
+    select.innerHTML += `<option value="\( {val}"> \){val}</option>`;
+  });
+}
+
+async function loadJobs(){
+  const querySnapshot = await getDocs(collection(db, "jobs"));
+
+  let html = "";
+
+  querySnapshot.forEach(doc=>{
+    let job = doc.data();
+
+    // ✅ MAP DATA
+    add(states, job["State"]);
+    add(cities, job["City"]);
+    add(areas, job["Area"]);
+    add(jobTypes, job["Job Type"]);
+    add(workTypes, job["Work Type"]);
+    add(modes, job["Working Mode"]);
+    add(shifts, job["Working Shifts"]);
+    add(genders, job["Gender"]);
+    add(educations, job["Education"]);
+
+    let status = (job.status || "").toLowerCase();
+    if(status !== "approved") return;
+
+    html += `
+    <div class="job job-card" id="job-\( {doc.id}" data-id=" \){doc.id}">
+
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="title">${job["Job Title"]}</div>
+
+        <div style="display:flex; gap:10px;">
+          <i class="fa-regular fa-bookmark saveBtn"
+             onclick="toggleSave('${doc.id}', this)"></i>
+
+          <i class="fa-solid fa-share-nodes shareBtn"
+             onclick="shareJob('\( {doc.id}', ' \){job["Job Title"]}')"></i>
+        </div>
+      </div>
+
+      <div class="company">${job["Company Name"]}</div>
+
+      <div class="salary">
+        ₹ ${job["Salary"] || "Not Disclosed"}
+      </div>
+
+      <div class="spacing"><b>Job Type:</b> ${job["Job Type"] || "-"}</div><br>
+
+      <div class="spacing location">
+        <i class="fa-solid fa-location-dot"></i>
+        <b>Location:</b> 
+        ${job["Area"] || "-"}, ${job["City"] || "-"}, ${job["State"] || "-"}
+      </div>
+
+      <div class="spacing location">
+        <i class="fa-solid fa-map-pin"></i>
+        ${job["Landmark"] || "-"}
+      </div>
+
+      <div class="moreDetails" id="more-${doc.id}" style="display:none;">
+        <br>
+        <div class="spacing"><b>Work Type:</b> ${job["Work Type"] || "-"}</div>
+        <div class="spacing"><b>Work Mode:</b> ${job["Working Mode"] || "-"}</div>
+        <div class="spacing"><b>Shift:</b> ${job["Working Shifts"] || "-"}</div>
+        <br>
+
+        <div class="spacing"><b>Gender:</b> ${job["Gender"] || "-"}</div>
+        <div class="spacing"><b>Education:</b> ${job["Education"] || "-"}</div>
+        <div class="spacing"><b>Experience:</b> ${job["Experience"] || "-"}</div>
+
+        <div class="desc"><b>Description:</b> ${job["Job Description"] || "-"}</div><br>
+
+        \( {job["Contact Number"] ? `<a class="btn call" href="tel: \){job["Contact Number"]}"><i class="fa-solid fa-phone"></i></a>` : ""}
+        \( {job["WhatsApp"] ? `<a class="whats" href="https://wa.me/91 \){job["WhatsApp"]}" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>` : ""}
+        \( {job["Email"] ? `<a class="mail" href="mailto: \){job["Email"]}"><i class="fa-solid fa-envelope"></i></a>` : ""}
+      </div>
+
+      <button class="readBtn" onclick="toggleDetails('${doc.id}', this)">Read More</button>
+    </div>
+    `;
+  });
+
+  // ✅ HTML INSERT (FIXED POSITION)
+  document.getElementById("jobs").innerHTML = html;
+
+  // ❤️ RESTORE SAVED ICONS (FIXED)
+  let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
+
+  document.querySelectorAll(".job-card").forEach(card=>{
+    let id = card.getAttribute("data-id");
+    let icon = card.querySelector(".saveBtn");
+
+    if(savedJobs.includes(id)){
+      icon.classList.remove("fa-regular");
+      icon.classList.add("fa-solid");
+    }
+  });
+
+  
+
+  // 🔥 UPDATE COUNT
+  updateSavedCount();
+
+  // 🔥 AUTO SCROLL
+  setTimeout(()=>{
+    let hash = window.location.hash;
+    if(hash){
+      let target = document.querySelector(hash);
+      if(target){
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        target.style.boxShadow = "0 0 0 3px #38bdf8";
+        setTimeout(()=>{ target.style.boxShadow = ""; }, 2000);
+      }
+    }
+  }, 500);
+
+  // ✅ FILTERS
+  fill("filterState", states);
+  fill("filterCity", cities);
+  fill("filterArea", areas);
+  fill("filterJobType", jobTypes);
+  fill("filterWorkType", workTypes);
+  fill("filterMode", modes);
+  fill("filterShift", shifts);
+  fill("filterGender", genders);
+  fill("filterEducation", educations);
+
+  document.getElementById("skeleton").style.display="none";
+  document.getElementById("jobs").style.display="block";
+}
+
+loadJobs();
+
+window.toggleDetails = function(id, btn){
+  let box = document.getElementById("more-" + id);
+
+  if(box.style.display === "none"){
+    box.style.display = "block";
+    btn.innerText = "Read Less";
+  }else{
+    box.style.display = "none";
+    btn.innerText = "Read More";
+  }
+}
+
+</script>
+
+</body>
+</html>

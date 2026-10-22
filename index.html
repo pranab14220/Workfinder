@@ -1,762 +1,602 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Work Finder</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f172a">
+<title>Work Finder - Find Your Job</title>
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
-*{
-  box-sizing:border-box;
-}
-
+*{box-sizing:border-box}
 body{
-  background:#e2e8f0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-  margin:0;
+  margin:0;background:#e2e8f0;
+  font-family:Arial,"Segoe UI",sans-serif;color:#0f172a
 }
-
+button,input,select{font:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
 .app{
-  max-width:480px;
-  margin:auto;
-  background:#f8fafc;
-  min-height:100vh;
+  max-width:600px;min-height:100vh;
+  margin:auto;background:#f8fafc
 }
-
 .header{
-  background:#0f172a;
-  color:white;
-  padding:18px;
-  text-align:center;
-  font-size:22px;
-  font-weight:bold;
-  letter-spacing:0.5px;
-  position:sticky;
-  top:0;
-  z-index: 30;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  height:64px;padding:0 16px;background:#0f172a;
+  color:white;display:flex;align-items:center;
+  justify-content:space-between;gap:14px;
+  position:sticky;top:0;z-index:20
 }
-
-.search-box{
-  position:relative;
-  display:flex;
-  align-items:center;
+.header button{
+  border:0;background:none;color:white;
+  font-size:20px;cursor:pointer;padding:8px
 }
-
-.search-box i{
-  font-size:20px;
-  cursor:pointer;
-  z-index:2;
+.logo{font-size:20px;font-weight:bold;white-space:nowrap}
+.search{
+  display:flex;align-items:center;gap:6px;min-width:0
 }
-
-.search-box input{
-  width:0;
-  opacity:0;
-  padding:8px 0;
-  margin-right:8px;
-  border:none;
-  outline:none;
-  border-radius:20px;
-  transition:0.4s;
+.search input{
+  display:none;width:155px;max-width:45vw;
+  border:0;border-radius:20px;padding:10px;
+  outline:none;background:white;color:#0f172a
 }
-
-.search-box.active input{
-  width:180px;
-  opacity:1;
-  padding:8px 12px;
-}
-
-.container{
-  padding:14px;
-}
-
-.job{
-  background:white;
-  margin:16px 0;
-  padding:16px;
-  border-radius:14px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08),
-              0 2px 6px rgba(0, 0, 0, 0.05);
-  transition:0.2s;
-}
-
-.job:active{
-  transform:scale(0.98);
-}
-
-.title{
-  font-size:20px;
-  font-weight:700;
-  margin-bottom:6px;
-  color:#0f172a;
-}
-
-.company{
-  font-size:15px;
-  color:#475569;
-  margin-bottom:10px;
-}
-
-.salary{
-  font-size:18px;
-  font-weight:bold;
-  color:#16a34a;
-  margin:8px 0;
-}
-
-.spacing{
-  font-size:15px;
-  margin:6px 0;
-  color:#334155;
-}
-
-.desc{
-  margin-top:30px;
-  font-size:14px;
-  color:#444;
-  line-height:1.5;
-}
-
-.btn, .whats, .mail{
-  display:inline-block;
-  margin:7px 5px 0 0;
-  padding:8px 8px 8px 12px;
-  border-radius:8px;
-  color:white;
-  text-decoration:none;
-  text-align:center;
-  font-size:17px;
-  font-weight:bold;
-}
-
-.call{ background:#EB2543; }
-.whats{ background:#22c55e; }
-.mail{ background:#0ea5e9; }
-
-.btn i, .whats i, .mail i{
-  margin-right:6px;
-}
-
-@media (max-width:600px){
-  .title{ font-size:21px; }
-  .spacing{ font-size:16px; }
-  .salary{ font-size:19px; }
-}
-
-.readBtn{
-  margin-top:10px;
-  padding:10px;
-  width:100%;
-  border:none;
-  border-radius:8px;
-  background:#0f172a;
-  color:white;
-  font-size:14px;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-.readBtn:hover{
-  background:#1e293b;
-}
-
-.moreDetails{
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn{
-  from{opacity:0; transform:translateY(5px);}
-  to{opacity:1; transform:translateY(0);}
-}
-
-.search-box.active i{
-  color:#38bdf8;
-}
-
+.search.open input{display:block}
 .filters{
-  display:flex;
-  align-items:center;
-  background:white;
-  position:sticky;
-  top:60px;
-  z-index:9;
-  padding:10px;
-  gap:8px;
+  display:flex;gap:8px;overflow-x:auto;padding:12px;
+  background:white;border-bottom:1px solid #e2e8f0;
+  position:sticky;top:64px;z-index:10
 }
-
 .filters select{
-  padding:6px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  font-size:13px;
+  min-width:115px;max-width:155px;
+  padding:9px;border:1px solid #cbd5e1;
+  border-radius:8px;background:white;color:#334155
 }
-
-#filterIcon{
-  font-size:25px;
-  padding:6px;
-  background:#f1f5f9;
-  border-radius:6px;
-  cursor:pointer;
-  flex-shrink:0;
+.filters button{
+  flex-shrink:0;border:0;border-radius:8px;
+  padding:8px 12px;background:#e2e8f0;color:#0f172a
 }
-
-#filterIcon.active{
-  color:#38bdf8;
+.container{padding:12px}
+.heading{font-size:18px;font-weight:bold;margin:8px 2px}
+#resultCount{font-size:13px;color:#64748b;margin:6px 2px 14px}
+.job{
+  background:white;border:1px solid #e2e8f0;
+  border-radius:14px;padding:16px;margin-bottom:14px;
+  box-shadow:0 4px 12px #0f172a0b
 }
-
-.filter-icon-box{
-  display:flex;
-  align-items:center;
+.jobTop{display:flex;align-items:flex-start;gap:10px}
+.jobTitle{font-size:19px;font-weight:bold;line-height:1.35;flex:1}
+.actions{display:flex;gap:14px;flex-shrink:0}
+.iconBtn{
+  border:0;background:none;padding:2px;
+  font-size:19px;color:#64748b;cursor:pointer
 }
-
-.filter-scroll{
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  align-items:center;
+.iconBtn.saved{color:#f59e0b}
+.company{margin-top:7px;color:#475569;font-size:14px}
+.salary{font-size:19px;color:#16a34a;font-weight:bold;margin:12px 0}
+.info{font-size:14px;color:#334155;line-height:1.6;margin:7px 0}
+.info i{width:20px;color:#64748b}
+.description{
+  white-space:pre-wrap;overflow-wrap:anywhere;
+  font-size:14px;line-height:1.6;color:#475569;margin-top:12px
 }
-
-#menuBtn{
-  font-size:20px;
-  cursor:pointer;
+.details{display:none;border-top:1px solid #e2e8f0;margin-top:12px;padding-top:8px}
+.details.show{display:block}
+.readBtn{
+  width:100%;padding:11px;margin-top:13px;
+  border:0;border-radius:8px;background:#0f172a;
+  color:white;font-weight:bold;cursor:pointer
 }
-
+.contact{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.contact a{
+  text-decoration:none;color:white;padding:10px 13px;
+  border-radius:8px;font-size:14px;font-weight:bold
+}
+.call{background:#e11d48}.whatsapp{background:#16a34a}
+.email{background:#0284c7}
+#message{
+  padding:35px 12px;text-align:center;
+  color:#64748b;line-height:1.6
+}
+.spinner{
+  width:25px;height:25px;border:3px solid #cbd5e1;
+  border-top-color:#0f172a;border-radius:50%;
+  animation:spin .8s linear infinite;margin:0 auto 12px
+}
+@keyframes spin{to{transform:rotate(360deg)}}
 .sidebar{
-  position:fixed;
-  top:0;
-  left:-240px;
-  width:220px;
-  height:100%;
-  background:#0f172a;
-  color:white;
-  transition:0.3s;
-  z-index:20;
-  display:flex;
-  flex-direction:column;
-  padding-top:100px;
+  position:fixed;inset:0 auto 0 0;width:260px;max-width:80vw;
+  background:#0f172a;color:white;z-index:40;
+  padding:24px 12px;transform:translateX(-105%);
+  transition:transform .25s;overflow-y:auto
 }
-
+.sidebar.open{transform:translateX(0)}
 .profile{
-  padding:20px;
-  text-align:center;
-  border-bottom:1px solid rgba(255,255,255,0.1);
+  padding:18px 12px 25px;border-bottom:1px solid #334155;
+  margin-bottom:12px
 }
-
-.avatar{
-  font-size:30px;
-  margin-bottom:6px;
+.profile i{font-size:28px;margin-bottom:10px}
+.profile div{font-weight:bold;font-size:18px}
+.profile small{display:block;margin-top:6px;color:#cbd5e1}
+.navBtn{
+  display:flex;align-items:center;gap:12px;width:100%;
+  padding:14px 12px;margin:3px 0;border:0;border-radius:8px;
+  background:transparent;color:#e2e8f0;text-align:left;
+  text-decoration:none;cursor:pointer;font-size:15px
 }
-
-.name{
-  font-size:14px;
-  color:#cbd5f5;
-}
-
-.sidebar a{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:14px 16px;
-  color:#cbd5f5;
-  text-decoration:none;
-  font-size:14px;
-  transition:0.2s;
-}
-
-.sidebar a i{
-  width:20px;
-  text-align:center;
-}
-
-.sidebar a:hover{
-  background:#1e293b;
-  color:white;
-}
-
-.sidebar a.active{
-  background:#38bdf8;
-  color:#0f172a;
-  font-weight:bold;
-  border-radius:0 20px 20px 0;
-}
-
-.sidebar.active{
-  left:0;
-}
-
-#overlay{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.3);
-  backdrop-filter: blur(4px);
-  opacity:0;
-  pointer-events:none;
-  transition:0.3s;
-  z-index:15;
-}
-
-#overlay.active{
-  opacity:1;
-  pointer-events:auto;
-}
-
+.navBtn.active,.navBtn:hover{background:#1e293b;color:#38bdf8}
 .badge{
-  background:red;
-  color:white;
-  font-size:11px;
-  padding:2px 6px;
-  border-radius:50px;
-  margin-left:6px;
+  margin-left:auto;background:#ef4444;color:white;
+  border-radius:20px;padding:2px 7px;font-size:12px
 }
-
-.saveBtn{
-  font-size:20px;
-  cursor:pointer;
-  color:#64748b;
+#overlay{
+  display:none;position:fixed;inset:0;background:#0008;
+  backdrop-filter:blur(2px);z-index:30
 }
-
-.saveBtn.fa-solid{
-  color:#f59e0b;
-}
-
-.shareBtn{
-  font-size:18px;
-  cursor:pointer;
-  color:#64748b;
-}
-
-.shareBtn:hover{
-  color:#0ea5e9;
+#overlay.open{display:block}
+.footer{text-align:center;padding:24px;color:#94a3b8;font-size:12px}
+@media(max-width:360px){
+  .header{padding:0 9px;gap:6px}
+  .logo{font-size:17px}
+  .job{padding:13px}
+  .jobTitle{font-size:17px}
 }
 </style>
 </head>
 
 <body>
+<div class="app">
 
-<div class="header">
-  <i class="fas fa-bars" id="menuBtn"></i>
-  <span>WorkFinder</span>
-  <div class="search-box">
-    <i class="fas fa-search" id="searchIcon"></i>
-    <input type="text" id="searchInput" placeholder="Search jobs...">
+  <header class="header">
+    <button id="menuBtn" aria-label="Open menu">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="logo">Work Finder</div>
+
+    <div class="search" id="searchBox">
+      <input id="searchInput" type="search"
+        placeholder="Search jobs..." aria-label="Search jobs">
+      <button id="searchBtn" aria-label="Search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+    </div>
+  </header>
+
+  <nav class="filters">
+    <select id="filterType"><option value="">All Job Types</option></select>
+    <select id="filterState"><option value="">All States</option></select>
+    <select id="filterCity"><option value="">All Cities</option></select>
+    <button id="resetBtn"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+  </nav>
+
+  <main class="container">
+    <div class="heading" id="pageHeading">Latest Jobs</div>
+    <div id="resultCount"></div>
+
+    <div id="message">
+      <div class="spinner"></div>
+      Loading jobs...
+    </div>
+
+    <div id="jobs"></div>
+  </main>
+
+  <footer class="footer">Work Finder · Find jobs near you</footer>
+</div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="profile">
+    <i class="fa-solid fa-briefcase"></i>
+    <div>Work Finder</div>
+    <small>Find your next opportunity</small>
   </div>
-</div>
 
-<div class="sidebar" id="sidebar">
-  <a href="https://pranab14220.github.io/Workfinder/" class="active">
-    <i class="fas fa-home"></i> Home
-  </a>
-  <a href="#" onclick="showSavedJobs(); return false;" id="savedNav">
-    <i class="fas fa-bookmark"></i> Saved Jobs
-    <span id="savedCount" class="badge">0</span>
-  </a>
-  <a href="#">
-    <i class="fas fa-bell"></i> Notifications
-  </a>
-  <a href="#">
-    <i class="fas fa-gear"></i> Settings
-  </a>
-</div>
+  <button class="navBtn active" data-page="home">
+    <i class="fa-solid fa-house"></i> Home
+  </button>
 
+  <button class="navBtn" data-page="saved">
+    <i class="fa-solid fa-bookmark"></i> Saved Jobs
+    <span class="badge" id="savedCount">0</span>
+  </button>
+
+  <a class="navBtn" href="https://pranab14220.github.io/Workfinder/">
+    <i class="fa-solid fa-globe"></i> Website Home
+  </a>
+
+  <button class="navBtn" id="closeMenu">
+    <i class="fa-solid fa-xmark"></i> Close Menu
+  </button>
+</aside>
 <div id="overlay"></div>
 
-<div class="app">
-  <div class="filters">
-    <div class="filter-icon-box">
-      <i class="fas fa-sliders-h" id="filterIcon"></i>
-    </div>
-    <div class="filter-scroll">
-      <select id="filterJobType"><option value="">Job Type</option></select>
-      <select id="filterState"><option value="">State</option></select>
-      <select id="filterCity"><option value="">City</option></select>
-      <select id="filterArea"><option value="">Area</option></select>
-      <select id="filterWorkType"><option value="">Work Type</option></select>
-      <select id="filterMode"><option value="">Work Mode</option></select>
-      <select id="filterShift"><option value="">Shift</option></select>
-      <select id="filterGender"><option value="">Gender</option></select>
-      <select id="filterEducation"><option value="">Education</option></select>
-    </div>
-  </div>
-
-  <div id="skeleton">Loading jobs...</div>
-  <div class="container" id="jobs" style="display:none;"></div>
-  <div id="noResults" style="display:none; text-align:center; padding:20px; color:#64748b;">
-    ❌ No jobs found
-  </div>
-</div>
-
-<script>
-const menuBtn = document.getElementById("menuBtn");
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-
-menuBtn.addEventListener("click", ()=>{
-  sidebar.classList.toggle("active");
-  overlay.classList.toggle("active");
-});
-
-overlay.addEventListener("click", ()=>{
-  sidebar.classList.remove("active");
-  overlay.classList.remove("active");
-});
-</script>
-
-<script>
-const searchIcon = document.getElementById("searchIcon");
-const searchBox = document.querySelector(".search-box");
-const searchInput = document.getElementById("searchInput");
-const noResults = document.getElementById("noResults");
-
-searchIcon.addEventListener("click", () => {
-  searchBox.classList.toggle("active");
-  if(searchBox.classList.contains("active")){
-    searchInput.focus();
-  }else{
-    searchInput.value = "";
-    searchInput.dispatchEvent(new Event("keyup"));
-  }
-});
-
-searchInput.addEventListener("keyup", function () {
-  let value = this.value.toLowerCase();
-  let jobs = document.querySelectorAll(".job-card");
-  let found = false;
-
-  jobs.forEach(job => {
-    let text = job.innerText.toLowerCase();
-    if (text.includes(value)) {
-      job.style.display = "block";
-      found = true;
-    } else {
-      job.style.display = "none";
-    }
-  });
-
-  noResults.style.display = found ? "none" : "block";
-});
-
-const filters = document.querySelectorAll(".filters select");
-filters.forEach(select=>{
-  select.addEventListener("change", applyFilters);
-});
-
-function shareJob(id, title){
-  let url = window.location.origin + window.location.pathname + "#job-" + id;
-  if(navigator.share){
-    navigator.share({
-      title: title,
-      text: "Check this job:",
-      url: url
-    });
-  }else{
-    navigator.clipboard.writeText(url);
-    alert("Link copied! Share anywhere");
-  }
-}
-
-function applyFilters(){
-  let jobs = document.querySelectorAll(".job-card");
-  let found = false;
-
-  let fJob = document.getElementById("filterJobType").value.toLowerCase();
-  let fState = document.getElementById("filterState").value.toLowerCase();
-  let fCity = document.getElementById("filterCity").value.toLowerCase();
-  let fArea = document.getElementById("filterArea").value.toLowerCase();
-  let fWork = document.getElementById("filterWorkType").value.toLowerCase();
-  let fMode = document.getElementById("filterMode").value.toLowerCase();
-  let fShift = document.getElementById("filterShift").value.toLowerCase();
-  let fGender = document.getElementById("filterGender").value.toLowerCase();
-  let fEdu = document.getElementById("filterEducation").value.toLowerCase();
-
-  jobs.forEach(job=>{
-    let text = job.innerText.toLowerCase();
-    let match =
-      (!fJob || text.includes(fJob)) &&
-      (!fState || text.includes(fState)) &&
-      (!fCity || text.includes(fCity)) &&
-      (!fArea || text.includes(fArea)) &&
-      (!fWork || text.includes(fWork)) &&
-      (!fMode || text.includes(fMode)) &&
-      (!fShift || text.includes(fShift)) &&
-      (!fGender || text.includes(fGender)) &&
-      (!fEdu || text.includes(fEdu));
-
-    if(match){
-      job.style.display = "block";
-      found = true;
-    }else{
-      job.style.display = "none";
-    }
-  });
-
-  document.getElementById("noResults").style.display = found ? "none" : "block";
-  checkFilters();
-}
-
-const filterIcon = document.getElementById("filterIcon");
-
-function checkFilters(){
-  let selects = document.querySelectorAll(".filters select");
-  let active = false;
-  selects.forEach(sel=>{
-    if(sel.value !== "") active = true;
-  });
-
-  if(active){
-    filterIcon.classList.add("active");
-    filterIcon.classList.remove("fa-sliders-h");
-    filterIcon.classList.add("fa-rotate-left");
-  }else{
-    filterIcon.classList.remove("active");
-    filterIcon.classList.remove("fa-rotate-left");
-    filterIcon.classList.add("fa-sliders-h");
-  }
-}
-
-function updateSavedCount(){
-  let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
-  let count = savedJobs.length;
-  let badge = document.getElementById("savedCount");
-  badge.innerText = count;
-  badge.style.display = count === 0 ? "none" : "inline-block";
-}
-
-filterIcon.addEventListener("click", ()=>{
-  if(filterIcon.classList.contains("fa-rotate-left")){
-    let selects = document.querySelectorAll(".filters select");
-    selects.forEach(sel=>{
-      sel.value = "";
-    });
-    applyFilters();
-  }
-});
-
-let isSavedMode = false;
-
-function showSavedJobs(){
-  isSavedMode = true;
-  applySavedFilter();
-}
-
-function applySavedFilter(){
-  let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
-  let jobs = document.querySelectorAll(".job-card");
-  let found = false;
-
-  jobs.forEach(job=>{
-    let id = job.getAttribute("data-id");
-    if(savedJobs.includes(id)){
-      job.style.display = "block";
-      found = true;
-    }else{
-      job.style.display = "none";
-    }
-  });
-
-  document.getElementById("noResults").style.display = found ? "none" : "block";
-}
-
-let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
-
-window.toggleSave = function(id, icon){
-  if(savedJobs.includes(id)){
-    savedJobs = savedJobs.filter(jobId => jobId !== id);
-    icon.classList.remove("fa-solid");
-    icon.classList.add("fa-regular");
-  }else{
-    savedJobs.push(id);
-    icon.classList.remove("fa-regular");
-    icon.classList.add("fa-solid");
-  }
-
-  localStorage.setItem("savedJobs", JSON.stringify(savedJobs));
-  updateSavedCount();
-
-  if(isSavedMode){
-    applySavedFilter();
-  }
-}
-</script>
-
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
+import {
+  getFirestore, collection, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* 1. Firebase configuration */
 const firebaseConfig = {
   apiKey: "AIzaSyCCBMrDXwhV8-2kz-FaMTYmLEODXRGNAdU",
   authDomain: "workfinder2-a5f80.firebaseapp.com",
-  projectId: "workfinder2-a5f80",
+  projectId: "workfinder2-a5f80"
 };
 
+/* 2. Connect to Firebase */
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let states = new Map();
-let cities = new Map();
-let areas = new Map();
-let jobTypes = new Map();
-let workTypes = new Map();
-let modes = new Map();
-let shifts = new Map();
-let genders = new Map();
-let educations = new Map();
+/* 3. Page elements */
+const jobsBox = document.getElementById("jobs");
+const message = document.getElementById("message");
+const countBox = document.getElementById("resultCount");
+const pageHeading = document.getElementById("pageHeading");
+const searchInput = document.getElementById("searchInput");
+const filterType = document.getElementById("filterType");
+const filterState = document.getElementById("filterState");
+const filterCity = document.getElementById("filterCity");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
 
-function add(map, value){
-  if(!value) return;
-  let key = value.toLowerCase().trim();
-  if(!map.has(key)){
-    map.set(key, value);
+let allJobs = [];
+let savedIds = readSaved();
+let currentPage = "home";
+let expandedIds = new Set();
+
+function readSaved() {
+  try {
+    const data = JSON.parse(localStorage.getItem("savedJobs") || "[]");
+    return Array.isArray(data) ? data.map(String) : [];
+  } catch {
+    return [];
   }
 }
 
-function fill(id, map){
-  let select = document.getElementById(id);
-  map.forEach(val=>{
-    select.innerHTML += `<option value="\( {val}"> \){val}</option>`;
-  });
+function saveSaved() {
+  try {
+    localStorage.setItem("savedJobs", JSON.stringify(savedIds));
+  } catch (error) {
+    console.warn("Could not save bookmarks", error);
+  }
 }
 
-async function loadJobs(){
-  try {
-    const querySnapshot = await getDocs(collection(db, "jobs"));
+function field(job, ...names) {
+  for (const name of names) {
+    const value = job[name];
+    if (value !== undefined && value !== null &&
+        String(value).trim() !== "") {
+      return String(value).trim();
+    }
+  }
+  return "";
+}
 
-    let html = "";
-    let hasJobs = false;
+/* Prevent database text from being interpreted as HTML */
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
 
-    querySnapshot.forEach(doc=>{
-      let job = doc.data();
+function normalize(value) {
+  return String(value || "").trim().toLowerCase();
+}
 
-      add(states, job["State"]);
-      add(cities, job["City"]);
-      add(areas, job["Area"]);
-      add(jobTypes, job["Job Type"]);
-      add(workTypes, job["Work Type"]);
-      add(modes, job["Working Mode"]);
-      add(shifts, job["Working Shifts"]);
-      add(genders, job["Gender"]);
-      add(educations, job["Education"]);
+function uniqueValues(values) {
+  return [...new Set(values.filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b));
+}
 
-      let status = (job.status || "").toLowerCase();
-      if(status !== "approved") return;
+function fillSelect(select, values, label) {
+  const previous = select.value;
+  select.replaceChildren(new Option(label, ""));
+  uniqueValues(values).forEach(value => {
+    select.add(new Option(value, value));
+  });
+  if ([...select.options].some(option => option.value === previous)) {
+    select.value = previous;
+  }
+}
 
-      hasJobs = true;
+function updateSavedCount() {
+  document.getElementById("savedCount").textContent = savedIds.length;
+  document.getElementById("savedCount").style.display =
+    savedIds.length ? "inline-block" : "none";
+}
 
-      html += `
-      <div class="job job-card" id="job-\( {doc.id}" data-id=" \){doc.id}">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div class="title">${job["Job Title"]}</div>
-          <div style="display:flex; gap:10px;">
-            <i class="fa-regular fa-bookmark saveBtn"
-               onclick="toggleSave('${doc.id}', this)"></i>
-            <i class="fa-solid fa-share-nodes shareBtn"
-               onclick="shareJob('\( {doc.id}', ' \){job["Job Title"]}')"></i>
-          </div>
-        </div>
-        <div class="company">${job["Company Name"]}</div>
-        <div class="salary">₹ ${job["Salary"] || "Not Disclosed"}</div>
-        <div class="spacing"><b>Job Type:</b> ${job["Job Type"] || "-"}</div><br>
-        <div class="spacing location">
-          <i class="fa-solid fa-location-dot"></i>
-          <b>Location:</b>
-          ${job["Area"] || "-"}, ${job["City"] || "-"}, ${job["State"] || "-"}
-        </div>
-        <div class="spacing location">
-          <i class="fa-solid fa-map-pin"></i>
-          ${job["Landmark"] || "-"}
-        </div>
-        <div class="moreDetails" id="more-${doc.id}" style="display:none;">
-          <br>
-          <div class="spacing"><b>Work Type:</b> ${job["Work Type"] || "-"}</div>
-          <div class="spacing"><b>Work Mode:</b> ${job["Working Mode"] || "-"}</div>
-          <div class="spacing"><b>Shift:</b> ${job["Working Shifts"] || "-"}</div>
-          <br>
-          <div class="spacing"><b>Gender:</b> ${job["Gender"] || "-"}</div>
-          <div class="spacing"><b>Education:</b> ${job["Education"] || "-"}</div>
-          <div class="spacing"><b>Experience:</b> ${job["Experience"] || "-"}</div>
-          <div class="desc"><b>Description:</b> ${job["Job Description"] || "-"}</div><br>
-          \( {job["Contact Number"] ? `<a class="btn call" href="tel: \){job["Contact Number"]}"><i class="fa-solid fa-phone"></i></a>` : ""}
-          \( {job["WhatsApp"] ? `<a class="whats" href="https://wa.me/91 \){job["WhatsApp"]}" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>` : ""}
-          \( {job["Email"] ? `<a class="mail" href="mailto: \){job["Email"]}"><i class="fa-solid fa-envelope"></i></a>` : ""}
-        </div>
-        <button class="readBtn" onclick="toggleDetails('${doc.id}', this)">Read More</button>
-      </div>
-      `;
+function openMenu(open) {
+  sidebar.classList.toggle("open", open);
+  overlay.classList.toggle("open", open);
+}
+
+document.getElementById("menuBtn").addEventListener("click", () => {
+  openMenu(!sidebar.classList.contains("open"));
+});
+document.getElementById("closeMenu").addEventListener("click", () => openMenu(false));
+overlay.addEventListener("click", () => openMenu(false));
+
+document.getElementById("searchBtn").addEventListener("click", () => {
+  const box = document.getElementById("searchBox");
+  box.classList.toggle("open");
+  if (box.classList.contains("open")) searchInput.focus();
+  else {
+    searchInput.value = "";
+    renderJobs();
+  }
+});
+
+searchInput.addEventListener("input", renderJobs);
+[filterType, filterState, filterCity].forEach(select => {
+  select.addEventListener("change", renderJobs);
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  searchInput.value = "";
+  filterType.value = "";
+  filterState.value = "";
+  filterCity.value = "";
+  renderJobs();
+});
+
+document.querySelectorAll(".navBtn[data-page]").forEach(button => {
+  button.addEventListener("click", () => {
+    currentPage = button.dataset.page;
+    document.querySelectorAll(".navBtn[data-page]").forEach(item => {
+      item.classList.toggle("active", item === button);
     });
+    pageHeading.textContent =
+      currentPage === "saved" ? "Saved Jobs" : "Latest Jobs";
+    openMenu(false);
+    renderJobs();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
 
-    document.getElementById("jobs").innerHTML = html;
+function matchesFilters(item) {
+  const job = item.data;
+  const text = [
+    field(job, "Job Title", "JobTitle", "title"),
+    field(job, "Company Name", "CompanyName", "company"),
+    field(job, "Salary", "salary"),
+    field(job, "Job Type", "JobType"),
+    field(job, "State", "state"),
+    field(job, "City", "city"),
+    field(job, "Area", "area"),
+    field(job, "Landmark", "Landmark"),
+    field(job, "Job Description", "JobDescription", "description"),
+    field(job, "Work Type", "WorkType"),
+    field(job, "Working Mode", "WorkingMode"),
+    field(job, "Working Shifts", "WorkingShifts"),
+    field(job, "Gender", "gender"),
+    field(job, "Education", "education"),
+    field(job, "Experience", "experience")
+  ].join(" ").toLowerCase();
 
-    let savedJobs = JSON.parse(localStorage.getItem("savedJobs")) || [];
-    document.querySelectorAll(".job-card").forEach(card=>{
-      let id = card.getAttribute("data-id");
-      let icon = card.querySelector(".saveBtn");
-      if(savedJobs.includes(id)){
-        icon.classList.remove("fa-regular");
-        icon.classList.add("fa-solid");
+  const query = normalize(searchInput.value);
+  return (
+    (!query || text.includes(query)) &&
+    (!filterType.value ||
+      field(job, "Job Type", "JobType") === filterType.value) &&
+    (!filterState.value ||
+      field(job, "State", "state") === filterState.value) &&
+    (!filterCity.value ||
+      field(job, "City", "city") === filterCity.value) &&
+    (currentPage !== "saved" || savedIds.includes(item.id))
+  );
+}
+
+function jobCard(item) {
+  const job = item.data;
+  const id = item.id;
+  const title = field(job, "Job Title", "JobTitle", "title") || "Job Vacancy";
+  const company = field(job, "Company Name", "CompanyName", "company") ||
+    "Company not specified";
+  const salary = field(job, "Salary", "salary") || "Not Disclosed";
+  const type = field(job, "Job Type", "JobType") || "-";
+  const area = field(job, "Area", "area");
+  const city = field(job, "City", "city");
+  const state = field(job, "State", "state");
+  const landmark = field(job, "Landmark", "landmark");
+  const workType = field(job, "Work Type", "WorkType") || "-";
+  const mode = field(job, "Working Mode", "WorkingMode") || "-";
+  const shift = field(job, "Working Shifts", "WorkingShifts") || "-";
+  const gender = field(job, "Gender", "gender") || "-";
+  const education = field(job, "Education", "education") || "-";
+  const experience = field(job, "Experience", "experience") || "-";
+  const description = field(job, "Job Description", "JobDescription", "description") || "No description provided.";
+  const phone = field(job, "Contact Number", "ContactNumber", "phone").replace(/[^\d+]/g, "");
+  const whatsappRaw = field(job, "WhatsApp", "Whatsapp", "whatsapp").replace(/\D/g, "");
+  const whatsapp = whatsappRaw
+    ? (whatsappRaw.length === 10 ? "91" + whatsappRaw : whatsappRaw)
+    : "";
+  const email = field(job, "Email", "email");
+  const saved = savedIds.includes(id);
+  const expanded = expandedIds.has(id);
+
+  const location = [area, city, state].filter(Boolean).join(", ") || "Not specified";
+  const shareUrl = locationUrl(id);
+
+  return `
+  <article class="job" id="job-${esc(id)}">
+    <div class="jobTop">
+      <div class="jobTitle">${esc(title)}</div>
+      <div class="actions">
+        <button class="iconBtn ${saved ? "saved" : ""}"
+          data-action="save" data-id="${esc(id)}"
+          aria-label="Save job">
+          <i class="${saved ? "fa-solid" : "fa-regular"} fa-bookmark"></i>
+        </button>
+        <button class="iconBtn" data-action="share"
+          data-id="${esc(id)}" aria-label="Share job">
+          <i class="fa-solid fa-share-nodes"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="company"><i class="fa-regular fa-building"></i>
+      ${esc(company)}</div>
+    <div class="salary">₹ ${esc(salary)}</div>
+    <div class="info"><i class="fa-solid fa-briefcase"></i>
+      <b>Job Type:</b> ${esc(type)}</div>
+    <div class="info"><i class="fa-solid fa-location-dot"></i>
+      <b>Location:</b> ${esc(location)}</div>
+    <div class="info"><i class="fa-solid fa-map-pin"></i>
+      <b>Landmark:</b> ${esc(landmark || "-")}</div>
+
+    <div class="details ${expanded ? "show" : ""}" id="details-${esc(id)}">
+      <div class="info"><b>Work Type:</b> ${esc(workType)}</div>
+      <div class="info"><b>Work Mode:</b> ${esc(mode)}</div>
+      <div class="info"><b>Shift:</b> ${esc(shift)}</div>
+      <div class="info"><b>Gender:</b> ${esc(gender)}</div>
+      <div class="info"><b>Education:</b> ${esc(education)}</div>
+      <div class="info"><b>Experience:</b> ${esc(experience)}</div>
+      <div class="description"><b>Description:</b>
+${esc(description)}</div>
+      <div class="contact">
+        ${phone ? `<a class="call" href="tel:${esc(phone)}">
+          <i class="fa-solid fa-phone"></i> Call</a>` : ""}
+        ${whatsapp ? `<a class="whatsapp"
+          href="https://wa.me/${esc(whatsapp)}" target="_blank"
+          rel="noopener noreferrer">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ""}
+        ${email ? `<a class="email" href="mailto:${esc(email)}">
+          <i class="fa-solid fa-envelope"></i> Email</a>` : ""}
+      </div>
+    </div>
+
+    <button class="readBtn" data-action="details" data-id="${esc(id)}">
+      ${expanded ? "Read Less" : "Read More"}
+    </button>
+  </article>`;
+}
+
+function locationUrl(id) {
+  return window.location.origin + window.location.pathname +
+    "#job-" + encodeURIComponent(id);
+}
+
+function renderJobs() {
+  const visible = allJobs.filter(matchesFilters);
+  countBox.textContent = `${visible.length} job${visible.length === 1 ? "" : "s"} found`;
+
+  if (!visible.length) {
+    jobsBox.innerHTML = "";
+    message.style.display = "block";
+    message.innerHTML = currentPage === "saved" && !savedIds.length
+      ? 'No saved jobs yet. Tap the bookmark icon on a job to save it.'
+      : "No jobs found. Try another search or reset the filters.";
+    return;
+  }
+
+  message.style.display = "none";
+  jobsBox.innerHTML = visible.map(jobCard).join("");
+}
+
+jobsBox.addEventListener("click", async event => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) return;
+
+  const id = button.dataset.id;
+  const action = button.dataset.action;
+
+  if (action === "save") {
+    savedIds = savedIds.includes(id)
+      ? savedIds.filter(savedId => savedId !== id)
+      : [...savedIds, id];
+    saveSaved();
+    updateSavedCount();
+    renderJobs();
+  }
+
+  if (action === "details") {
+    if (expandedIds.has(id)) expandedIds.delete(id);
+    else expandedIds.add(id);
+    renderJobs();
+  }
+
+  if (action === "share") {
+    const item = allJobs.find(job => job.id === id);
+    const title = item
+      ? field(item.data, "Job Title", "JobTitle", "title") || "Job Vacancy"
+      : "Work Finder Job";
+
+    const url = locationUrl(id);
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text: "Check this job on Work Finder", url });
+      } else if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+        alert("Job link copied!");
+      } else {
+        prompt("Copy this job link:", url);
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        prompt("Copy this job link:", url);
+      }
+    }
+  }
+});
+
+async function loadJobs() {
+  try {
+    message.style.display = "block";
+    message.innerHTML = '<div class="spinner"></div>Loading jobs from Firebase...';
+
+    const snapshot = await getDocs(collection(db, "jobs"));
+
+    allJobs = [];
+    snapshot.forEach(documentSnapshot => {
+      const data = documentSnapshot.data();
+      const status = normalize(data.status);
+
+      // Only approved jobs are public
+      if (status === "approved") {
+        allJobs.push({ id: documentSnapshot.id, data });
       }
     });
+
+    fillSelect(filterType,
+      allJobs.map(item => field(item.data, "Job Type", "JobType")),
+      "All Job Types");
+
+    fillSelect(filterState,
+      allJobs.map(item => field(item.data, "State", "state")),
+      "All States");
+
+    fillSelect(filterCity,
+      allJobs.map(item => field(item.data, "City", "city")),
+      "All Cities");
 
     updateSavedCount();
+    renderJobs();
 
-    setTimeout(()=>{
-      let hash = window.location.hash;
-      if(hash){
-        let target = document.querySelector(hash);
-        if(target){
-          target.scrollIntoView({ behavior: "smooth", block: "center" });
-          target.style.boxShadow = "0 0 0 3px #38bdf8";
-          setTimeout(()=>{ target.style.boxShadow = ""; }, 2000);
-        }
-      }
-    }, 500);
-
-    fill("filterState", states);
-    fill("filterCity", cities);
-    fill("filterArea", areas);
-    fill("filterJobType", jobTypes);
-    fill("filterWorkType", workTypes);
-    fill("filterMode", modes);
-    fill("filterShift", shifts);
-    fill("filterGender", genders);
-    fill("filterEducation", educations);
-
-    document.getElementById("skeleton").style.display="none";
-    document.getElementById("jobs").style.display="block";
-
-    if(!hasJobs){
-      document.getElementById("noResults").style.display = "block";
-      document.getElementById("noResults").innerText = "No approved jobs found";
-    }
   } catch (error) {
-    console.error("Error loading jobs:", error);
-    document.getElementById("skeleton").innerHTML = `
-      <div style="padding:20px; color:red; text-align:center;">
-        ❌ Error loading jobs<br>
-        <small>${error.message}</small>
-      </div>
+    console.error("Firebase job loading error:", error);
+    jobsBox.innerHTML = "";
+    countBox.textContent = "";
+    message.style.display = "block";
+    message.innerHTML = `
+      <b style="color:#dc2626">Unable to load jobs</b>
+      <p>Firebase se data load nahi hua.</p>
+      <p style="font-size:13px;overflow-wrap:anywhere">
+        ${esc(error.code || error.message || "Unknown error")}
+      </p>
+      <button id="retryBtn" class="readBtn">Try Again</button>
     `;
+    document.getElementById("retryBtn").addEventListener("click", loadJobs);
   }
 }
 
 loadJobs();
-
-window.toggleDetails = function(id, btn){
-  let box = document.getElementById("more-" + id);
-  if(box.style.display === "none"){
-    box.style.display = "block";
-    btn.innerText = "Read Less";
-  }else{
-    box.style.display = "none";
-    btn.innerText = "Read More";
-  }
-}
 </script>
-
 </body>
 </html>

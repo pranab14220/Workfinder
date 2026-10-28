@@ -514,12 +514,11 @@ onAuthStateChanged(auth, async user => {
     return;
   }
 
-  if (ADMIN_UID === "fk9WiZisFfTKwo9YAZbqUsUegTI3" ||
-      user.uid !== ADMIN_UID) {
-    await signOut(auth);
-    errorBox.textContent = "Is account ko Admin access nahi hai.";
-    return;
-  }
+ if (!ADMIN_UID || user.uid !== ADMIN_UID) {
+  await signOut(auth);
+  errorBox.textContent = "Is account ko Admin access nahi hai.";
+  return;
+}
 
   loginSection.hidden = true;
   dashboard.hidden = false;

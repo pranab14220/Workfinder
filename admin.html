@@ -482,7 +482,7 @@ loginForm.addEventListener("submit", async event => {
   event.preventDefault();
   errorBox.textContent = "";
 
-  if (ADMIN_UID === "PASTE_YOUR_ADMIN_UID_HERE") {
+  if (ADMIN_UID === "fk9WiZisFfTKwo9YAZbqUsUegTI3) {
     errorBox.textContent = "Pehle code mein apna Firebase Admin UID set karo.";
     return;
   }
@@ -514,11 +514,12 @@ onAuthStateChanged(auth, async user => {
     return;
   }
 
- if (!ADMIN_UID || user.uid !== ADMIN_UID) {
-  await signOut(auth);
-  errorBox.textContent = "Is account ko Admin access nahi hai.";
-  return;
-}
+  if (ADMIN_UID === "PASTE_YOUR_ADMIN_UID_HERE" ||
+      user.uid !== ADMIN_UID) {
+    await signOut(auth);
+    errorBox.textContent = "Is account ko Admin access nahi hai.";
+    return;
+  }
 
   loginSection.hidden = true;
   dashboard.hidden = false;

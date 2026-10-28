@@ -185,7 +185,7 @@ const firebaseConfig = {
 };
 
 /* Replace this with your actual Firebase Auth user UID */
-const ADMIN_UID = "PASTE_YOUR_ADMIN_UID_HERE";
+const ADMIN_UID = "fk9WiZisFfTKwo9YAZbqUsUegTI3";
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -482,7 +482,7 @@ loginForm.addEventListener("submit", async event => {
   event.preventDefault();
   errorBox.textContent = "";
 
-  if (ADMIN_UID === "fk9WiZisFfTKwo9YAZbqUsUegTI3") {
+  if (ADMIN_UID === "paste your code here") {
     errorBox.textContent = "Pehle code mein apna Firebase Admin UID set karo.";
     return;
   }

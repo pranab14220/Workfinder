@@ -7,8 +7,7 @@
 <meta name="theme-color" content="#0f172a">
 <title>Work Finder - Admin</title>
 
-<link rel="stylesheet"
- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 *{box-sizing:border-box}
@@ -63,9 +62,7 @@ hr{border:0;border-top:1px solid #e2e8f0;margin:13px 0}
 <div class="app">
 
 <header class="header">
-  <div class="logo">
-    <i class="fa-solid fa-briefcase"></i> Work Finder Admin
-  </div>
+  <div class="logo"><i class="fa-solid fa-briefcase"></i> Work Finder Admin</div>
   <button id="logoutBtn" hidden>
     <i class="fa-solid fa-right-from-bracket"></i> Logout
   </button>
@@ -77,10 +74,8 @@ hr{border:0;border-top:1px solid #e2e8f0;margin:13px 0}
     <p class="muted">Sirf authorized administrator login kar sakta hai.</p>
 
     <form id="loginForm">
-      <input id="email" type="email" placeholder="Admin email"
-        autocomplete="username" required>
-      <input id="password" type="password" placeholder="Password"
-        autocomplete="current-password" required>
+      <input id="email" type="email" placeholder="Admin email" autocomplete="username" required>
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" required>
       <button class="primary" type="submit">Login</button>
     </form>
     <p id="error" role="alert"></p>
@@ -117,21 +112,13 @@ import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-  getFirestore,
-  collection,
-  doc,
-  updateDoc,
-  onSnapshot,
-  serverTimestamp,
-  writeBatch,
-  deleteField
+  getFirestore, collection, doc, updateDoc, onSnapshot,
+  serverTimestamp, writeBatch, deleteField
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
-  getAuth,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut
+  getAuth, signInWithEmailAndPassword,
+  onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
@@ -161,15 +148,39 @@ let currentSection = "pending";
 let unsubscribeJobs = null;
 let unsubscribeRequests = null;
 let busy = false;
-let authReady = false;
+
+// Fields an HR is allowed to propose for an edit.
+// Keep this list consistent with the HR dashboard and Firestore Rules.
+const ALLOWED_EDIT_FIELDS = new Set([
+  "Job Title",
+  "Company Name",
+  "Salary",
+  "Job Type",
+  "State",
+  "City",
+  "Area",
+  "Landmark",
+  "Job Description",
+  "Contact Number",
+  "WhatsApp",
+  "Email",
+  "Work Type",
+  "Working Mode",
+  "Working Shifts",
+  "Gender",
+  "Education",
+  "Experience",
+  "Plan",
+  "duration",
+  "priority",
+  "Expiry Date",
+  "Active/Inactive"
+]);
 
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
   })[c]);
 }
 
@@ -245,12 +256,8 @@ function setCounts() {
 
   document.getElementById("pendingCount").textContent =
     pendingJobs + pendingEdits;
-
-  document.getElementById("approvedCount").textContent =
-    approvedJobs;
-
-  document.getElementById("rejectedCount").textContent =
-    rejectedJobs;
+  document.getElementById("approvedCount").textContent = approvedJobs;
+  document.getElementById("rejectedCount").textContent = rejectedJobs;
 }
 
 function makeCard(item) {
@@ -260,53 +267,40 @@ function makeCard(item) {
 
   const title = field(job, "Job Title", "JobTitle", "title")
     || "Job Vacancy";
-
   const company = field(job, "Company Name", "CompanyName", "company")
     || "Company not specified";
-
   const salary = field(job, "Salary", "salary") || "Not Disclosed";
 
-  const area = field(job, "Area", "area");
-  const city = field(job, "City", "city");
-  const state = field(job, "State", "state");
-
-  const location = [area, city, state].filter(Boolean).join(", ")
-    || "Not specified";
+  const location = [
+    field(job, "Area", "area"),
+    field(job, "City", "city"),
+    field(job, "State", "state")
+  ].filter(Boolean).join(", ") || "Not specified";
 
   const internalFields = new Set([
-    "editPending",
-    "pendingEditRequestId",
-    "reviewedAt",
-    "hrUid"
+    "editPending", "pendingEditRequestId", "reviewedAt", "hrUid"
   ]);
 
   const known = new Set([
     "Job Title", "JobTitle", "title",
     "Company Name", "CompanyName", "company",
-    "Salary", "salary",
-    "status",
-    ...internalFields
+    "Salary", "salary", "status", ...internalFields
   ]);
 
   const extraFields = Object.entries(job)
     .filter(([key]) => !known.has(key))
     .map(([key, value]) => `
-      <div class="info">
-        <b>${esc(labelOf(key))}:</b>
+      <div class="info"><b>${esc(labelOf(key))}:</b>
         ${esc(displayValue(value) || "-")}
-      </div>
-    `).join("");
+      </div>`).join("");
 
   const actionButtons =
     status === "pending" && job.editPending !== true
-      ? `
-        <div class="buttons">
-          <button class="approve" data-action="approve"
-            data-id="${esc(id)}">
+      ? `<div class="buttons">
+          <button class="approve" data-action="approve" data-id="${esc(id)}">
             <i class="fa-solid fa-check"></i> Approve
           </button>
-          <button class="reject" data-action="reject"
-            data-id="${esc(id)}">
+          <button class="reject" data-action="reject" data-id="${esc(id)}">
             <i class="fa-solid fa-xmark"></i> Reject
           </button>
         </div>`
@@ -322,70 +316,30 @@ function makeCard(item) {
       <div class="jobTitle">${esc(title)}</div>
       <span class="status ${status}">${esc(status.toUpperCase())}</span>
     </div>
-
-    <div class="company">
-      <i class="fa-regular fa-building"></i> ${esc(company)}
-    </div>
-
+    <div class="company"><i class="fa-regular fa-building"></i> ${esc(company)}</div>
     <div class="salary">₹ ${esc(salary)}</div>
 
-    <div class="info"><b>Job Type:</b>
-      ${esc(field(job,"Job Type","JobType") || "-")}
-    </div>
-
+    <div class="info"><b>Job Type:</b> ${esc(field(job,"Job Type","JobType") || "-")}</div>
     <div class="info"><b>Location:</b> ${esc(location)}</div>
-
-    <div class="info"><b>Landmark:</b>
-      ${esc(field(job,"Landmark","landmark") || "-")}
-    </div>
+    <div class="info"><b>Landmark:</b> ${esc(field(job,"Landmark","landmark") || "-")}</div>
 
     <hr>
-
-    <div class="info"><b>Work Type:</b>
-      ${esc(field(job,"Work Type","WorkType") || "-")}
-    </div>
-
-    <div class="info"><b>Working Mode:</b>
-      ${esc(field(job,"Working Mode","WorkingMode") || "-")}
-    </div>
-
-    <div class="info"><b>Working Shifts:</b>
-      ${esc(field(job,"Working Shifts","WorkingShifts") || "-")}
-    </div>
-
-    <div class="info"><b>Gender:</b>
-      ${esc(field(job,"Gender","gender") || "-")}
-    </div>
-
-    <div class="info"><b>Education:</b>
-      ${esc(field(job,"Education","education") || "-")}
-    </div>
-
-    <div class="info"><b>Experience:</b>
-      ${esc(field(job,"Experience","experience") || "-")}
-    </div>
+    <div class="info"><b>Work Type:</b> ${esc(field(job,"Work Type","WorkType") || "-")}</div>
+    <div class="info"><b>Working Mode:</b> ${esc(field(job,"Working Mode","WorkingMode") || "-")}</div>
+    <div class="info"><b>Working Shifts:</b> ${esc(field(job,"Working Shifts","WorkingShifts") || "-")}</div>
+    <div class="info"><b>Gender:</b> ${esc(field(job,"Gender","gender") || "-")}</div>
+    <div class="info"><b>Education:</b> ${esc(field(job,"Education","education") || "-")}</div>
+    <div class="info"><b>Experience:</b> ${esc(field(job,"Experience","experience") || "-")}</div>
 
     <div class="description"><b>Job Description:</b>
 ${esc(field(job,"Job Description","JobDescription","description") || "No description provided.")}</div>
 
     <hr>
+    <div class="info"><b>Contact Number:</b> ${esc(field(job,"Contact Number","ContactNumber","phone") || "-")}</div>
+    <div class="info"><b>WhatsApp:</b> ${esc(field(job,"WhatsApp","Whatsapp","whatsapp") || "-")}</div>
+    <div class="info"><b>Email:</b> ${esc(field(job,"Email","email") || "-")}</div>
 
-    <div class="info"><b>Contact Number:</b>
-      ${esc(field(job,"Contact Number","ContactNumber","phone") || "-")}
-    </div>
-
-    <div class="info"><b>WhatsApp:</b>
-      ${esc(field(job,"WhatsApp","Whatsapp","whatsapp") || "-")}
-    </div>
-
-    <div class="info"><b>Email:</b>
-      ${esc(field(job,"Email","email") || "-")}
-    </div>
-
-    ${extraFields
-      ? `<hr><h3>Other Job Details</h3>${extraFields}`
-      : ""}
-
+    ${extraFields ? `<hr><h3>Other Job Details</h3>${extraFields}` : ""}
     ${editWaiting}
     ${actionButtons}
   </article>`;
@@ -395,28 +349,24 @@ function makeEditRequestCard(item) {
   const request = item.data;
   const id = item.id;
 
-  const original = jobs.find(job =>
-    job.id === request.originalJobId
-  );
-
+  const original = jobs.find(job => job.id === request.originalJobId);
   const originalTitle = original
     ? field(original.data, "Job Title", "JobTitle", "title")
     : "Original job not found";
 
   const changes = request.proposedChanges || {};
 
-  const changesHtml = Object.entries(changes)
-    .map(([key, value]) => `
-      <div class="info">
-        <b>${esc(labelOf(key))}:</b>
-        ${esc(displayValue(value) || "-")}
-      </div>
-    `).join("");
+  const changesHtml = Object.entries(changes).map(([key, value]) => `
+    <div class="info">
+      <b>${esc(labelOf(key))}:</b> ${esc(displayValue(value) || "-")}
+    </div>`).join("");
 
   const validLink = !!original &&
     original.data.hrUid === request.hrUid &&
+    original.data.status === "approved" &&
     original.data.editPending === true &&
-    original.data.pendingEditRequestId === id;
+    original.data.pendingEditRequestId === id &&
+    request.status === "pending";
 
   return `
     <article class="job">
@@ -425,43 +375,29 @@ function makeEditRequestCard(item) {
         <span class="status pending">PENDING EDIT</span>
       </div>
 
-      <div class="info">
-        <b>Original Job:</b> ${esc(originalTitle)}
-      </div>
-
-      <div class="info">
-        <b>Job ID:</b> ${esc(request.originalJobId || "-")}
-      </div>
-
-      <div class="info">
-        <b>HR UID:</b> ${esc(request.hrUid || "-")}
-      </div>
+      <div class="info"><b>Original Job:</b> ${esc(originalTitle)}</div>
+      <div class="info"><b>Job ID:</b> ${esc(request.originalJobId || "-")}</div>
+      <div class="info"><b>HR UID:</b> ${esc(request.hrUid || "-")}</div>
 
       <hr>
       <h3>Proposed Changes</h3>
-
       ${changesHtml || '<p class="muted">No changes supplied.</p>'}
 
       ${!validLink ? `
         <p class="info" style="color:#b91c1c">
-          Job/request link or ownership check failed.
-          Do not approve this request until it is investigated.
+          Job/request verification failed. Do not approve this request.
         </p>
       ` : `
         <div class="buttons">
-          <button class="approve" data-action="approve-edit"
-            data-id="${esc(id)}">
+          <button class="approve" data-action="approve-edit" data-id="${esc(id)}">
             <i class="fa-solid fa-check"></i> Approve Edit
           </button>
-
-          <button class="reject" data-action="reject-edit"
-            data-id="${esc(id)}">
+          <button class="reject" data-action="reject-edit" data-id="${esc(id)}">
             <i class="fa-solid fa-xmark"></i> Reject Edit
           </button>
         </div>
       `}
-    </article>
-  `;
+    </article>`;
 }
 
 function renderJobs() {
@@ -471,30 +407,16 @@ function renderJobs() {
     `<h2>${labelOf(currentSection)} ${currentSection === "pending" ? "Jobs & Edit Requests" : "Jobs"}</h2>`;
 
   document.querySelectorAll(".tab").forEach(button => {
-    button.classList.toggle(
-      "active",
-      button.dataset.section === currentSection
-    );
+    button.classList.toggle("active", button.dataset.section === currentSection);
   });
 
   let visibleJobs = jobs.filter(item => {
     const status = statusOf(item.data);
-
     if (currentSection === "approved") {
-      return status === "approved" &&
-        item.data.editPending !== true;
+      return status === "approved" && item.data.editPending !== true;
     }
-
     return status === currentSection;
   });
-
-  // Hide the original approved job from the Approved tab
-  // while its edit request is awaiting review.
-  if (currentSection === "approved") {
-    visibleJobs = visibleJobs.filter(item =>
-      item.data.editPending !== true
-    );
-  }
 
   const visibleEdits = currentSection === "pending"
     ? editRequests.filter(item => item.data.status === "pending")
@@ -523,10 +445,7 @@ function startJobsListener() {
   unsubscribeJobs = onSnapshot(
     collection(db, "jobs"),
     snapshot => {
-      jobs = snapshot.docs.map(d => ({
-        id: d.id,
-        data: d.data()
-      }));
+      jobs = snapshot.docs.map(d => ({id:d.id, data:d.data()}));
       renderJobs();
     },
     error => {
@@ -538,24 +457,20 @@ function startJobsListener() {
   unsubscribeRequests = onSnapshot(
     collection(db, "jobEditRequests"),
     snapshot => {
-      editRequests = snapshot.docs.map(d => ({
-        id: d.id,
-        data: d.data()
-      }));
+      editRequests = snapshot.docs.map(d => ({id:d.id, data:d.data()}));
       renderJobs();
     },
     error => {
       console.error("Edit requests listener:", error);
-      showNotice(
-        "Edit requests load nahi hui: " +
-        (error.code || error.message)
-      );
+      showNotice("Edit requests load nahi hui: " + (error.code || error.message));
     }
   );
 }
 
 async function changeStatus(id, nextStatus) {
   if (busy) return;
+
+  if (!["approved", "rejected"].includes(nextStatus)) return;
 
   const item = jobs.find(job => job.id === id);
 
@@ -569,16 +484,11 @@ async function changeStatus(id, nextStatus) {
     return;
   }
 
-  const title = field(item.data, "Job Title", "JobTitle", "title")
-    || "this job";
+  const title = field(item.data, "Job Title", "JobTitle", "title") || "this job";
 
-  const confirmed = confirm(
-    nextStatus === "approved"
-      ? `Approve "${title}"?`
-      : `Reject "${title}"?`
-  );
-
-  if (!confirmed) return;
+  if (!confirm(nextStatus === "approved"
+    ? `Approve "${title}"?`
+    : `Reject "${title}"?`)) return;
 
   busy = true;
 
@@ -601,6 +511,11 @@ async function changeStatus(id, nextStatus) {
 async function changeEditRequest(id, nextStatus) {
   if (busy) return;
 
+  if (!["approved", "rejected"].includes(nextStatus)) {
+    showNotice("Invalid request status.");
+    return;
+  }
+
   const item = editRequests.find(request => request.id === id);
 
   if (!item || item.data.status !== "pending") {
@@ -609,9 +524,7 @@ async function changeEditRequest(id, nextStatus) {
   }
 
   const request = item.data;
-  const original = jobs.find(job =>
-    job.id === request.originalJobId
-  );
+  const original = jobs.find(job => job.id === request.originalJobId);
 
   if (!original) {
     showNotice("Original job nahi mili. Request manually check karo.");
@@ -620,10 +533,11 @@ async function changeEditRequest(id, nextStatus) {
 
   const job = original.data;
 
-  // Check the job/request relationship before processing.
+  // Verify the linked request and original job before any action.
   if (
     !request.hrUid ||
     job.hrUid !== request.hrUid ||
+    job.status !== "approved" ||
     job.editPending !== true ||
     job.pendingEditRequestId !== id
   ) {
@@ -633,11 +547,11 @@ async function changeEditRequest(id, nextStatus) {
 
   const isApprove = nextStatus === "approved";
 
-  if (!confirm(
-    isApprove
-      ? "Edit approve karke proposed changes apply karne hain?"
-      : "Edit reject karni hai? Purani job bhi hidden rahegi."
-  )) return;
+  if (!confirm(isApprove
+    ? "Edit approve karke proposed changes apply karne hain?"
+    : "Edit reject karni hai? Purani approved job unchanged rahegi.")) {
+    return;
+  }
 
   busy = true;
 
@@ -652,25 +566,35 @@ async function changeEditRequest(id, nextStatus) {
       throw new Error("Invalid proposedChanges data.");
     }
 
-    const protectedFields = new Set([
-      "hrUid",
-      "status",
-      "editPending",
-      "pendingEditRequestId",
-      "reviewedAt",
-      "createdAt",
-      "originalJobId",
-      "proposedChanges",
-      "approvedAt",
-      "rejectedAt"
-    ]);
-
     const safeChanges = {};
 
     if (isApprove) {
+      const keys = Object.keys(changes);
+
+      if (keys.length === 0) {
+        throw new Error("Request mein koi proposed change nahi hai.");
+      }
+
       for (const [key, value] of Object.entries(changes)) {
-        if (protectedFields.has(key)) {
-          throw new Error("Request contains a protected field: " + key);
+        if (!ALLOWED_EDIT_FIELDS.has(key)) {
+          throw new Error("Field change allowed nahi hai: " + key);
+        }
+
+        if (
+          value === undefined ||
+          (typeof value !== "string" &&
+           typeof value !== "number" &&
+           typeof value !== "boolean")
+        ) {
+          throw new Error("Invalid value for field: " + key);
+        }
+
+        if (typeof value === "string" && value.length > 10000) {
+          throw new Error("Field value bahut lambi hai: " + key);
+        }
+
+        if (typeof value === "number" && !Number.isFinite(value)) {
+          throw new Error("Invalid numeric value for: " + key);
         }
 
         safeChanges[key] = value;
@@ -682,6 +606,7 @@ async function changeEditRequest(id, nextStatus) {
     const requestRef = doc(db, "jobEditRequests", id);
 
     if (isApprove) {
+      // Apply only validated changes. Keep ownership and approval state.
       batch.update(jobRef, {
         ...safeChanges,
         status: "approved",
@@ -690,15 +615,15 @@ async function changeEditRequest(id, nextStatus) {
         reviewedAt: serverTimestamp()
       });
     } else {
-      // Old version must remain unpublished after rejection.
+      // IMPORTANT: do not change the original job's approved status.
+      // Only clear the edit lock; original details remain unchanged.
       batch.update(jobRef, {
-        status: "rejected",
         editPending: false,
-        pendingEditRequestId: deleteField(),
-        reviewedAt: serverTimestamp()
+        pendingEditRequestId: deleteField()
       });
     }
 
+    // Update the request and job atomically.
     batch.update(requestRef, {
       status: nextStatus,
       reviewedAt: serverTimestamp()
@@ -706,11 +631,9 @@ async function changeEditRequest(id, nextStatus) {
 
     await batch.commit();
 
-    showNotice(
-      isApprove
-        ? "Edit approved. Updated job details saved."
-        : "Edit rejected. Original job remains hidden."
-    );
+    showNotice(isApprove
+      ? "Edit approved. Updated job details saved."
+      : "Edit rejected. Original approved job remains unchanged.");
   } catch (error) {
     console.error("Edit review failed:", error);
     showNotice("Request update failed: " + (error.code || error.message));
@@ -724,7 +647,7 @@ document.querySelectorAll(".tab").forEach(button => {
   button.addEventListener("click", () => {
     currentSection = button.dataset.section;
     renderJobs();
-    window.scrollTo({top: 0, behavior: "smooth"});
+    window.scrollTo({top:0, behavior:"smooth"});
   });
 });
 
@@ -740,10 +663,7 @@ jobsBox.addEventListener("click", event => {
   }
 
   if (action === "approve-edit" || action === "reject-edit") {
-    changeEditRequest(
-      id,
-      action === "approve-edit" ? "approved" : "rejected"
-    );
+    changeEditRequest(id, action === "approve-edit" ? "approved" : "rejected");
   }
 });
 
@@ -758,8 +678,7 @@ loginForm.addEventListener("submit", async event => {
       document.getElementById("password").value
     );
   } catch (error) {
-    errorBox.textContent =
-      "Login failed: " + (error.code || error.message);
+    errorBox.textContent = "Login failed: " + (error.code || error.message);
   }
 });
 
@@ -774,7 +693,6 @@ logoutBtn.addEventListener("click", async () => {
 });
 
 onAuthStateChanged(auth, async user => {
-  authReady = true;
   stopListeners();
   hideNotice();
 
@@ -786,11 +704,16 @@ onAuthStateChanged(auth, async user => {
   }
 
   if (user.uid !== ADMIN_UID) {
-    await signOut(auth);
-    loginSection.hidden = false;
     dashboard.hidden = true;
+    loginSection.hidden = false;
     logoutBtn.hidden = true;
     errorBox.textContent = "Is account ko Admin access nahi hai.";
+
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Unauthorized sign-out failed:", error);
+    }
     return;
   }
 

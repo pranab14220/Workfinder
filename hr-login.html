@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f172a">
+  <title>HR Login - Work Finder</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: #f1f5f9;
+      color: #0f172a;
+      font-family: Arial, sans-serif;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 400px;
+      background: #fff;
+      padding: 30px 24px;
+      border-radius: 18px;
+      box-shadow: 0 12px 35px rgba(15, 23, 42, .10);
+      text-align: center;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: #0f172a;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 25px;
+    }
+
+    .subtitle {
+      color: #64748b;
+      line-height: 1.6;
+      font-size: 14px;
+      margin-bottom: 25px;
+    }
+
+    .google-btn {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .google-btn:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    .google-icon {
+      font-size: 20px;
+      font-weight: bold;
+      color: #4285F4;
+    }
+
+    #message {
+      margin-top: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .error {
+      color: #b91c1c;
+    }
+
+    .info {
+      color: #475569;
+    }
+
+    .home-link {
+      display: inline-block;
+      margin-top: 24px;
+      color: #2563eb;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .note {
+      margin-top: 22px;
+      padding: 12px;
+      background: #f8fafc;
+      border-radius: 9px;
+      color: #475569;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="login-card">
+    <div class="logo">WF</div>
+
+    <h1>HR Portal</h1>
+
+    <p class="subtitle">
+      Sign in with your Google account to post jobs
+      and manage your vacancies.
+    </p>
+
+    <button id="googleLogin" class="google-btn">
+      <span class="google-icon">G</span>
+      <span>Sign in with Google</span>
+    </button>
+
+    <div id="message" role="status" aria-live="polite"></div>
+
+    <div class="note">
+      New HR users are welcome. Job posts and edits will
+      require admin approval before appearing publicly.
+    </div>
+
+    <a class="home-link"
+       href="https://pranab14220.github.io/Workfinder/">
+      ← Back to Work Finder
+    </a>
+  </main>
+
+  <script type="module">
+    import { initializeApp }
+      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      signInWithRedirect,
+      getRedirectResult,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCCBMrDXwhV8-2kz-FaMTYmLEODXRGNAdU",
+      authDomain: "workfinder2-a5f80.firebaseapp.com",
+      projectId: "workfinder2-a5f80"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const loginButton = document.getElementById("googleLogin");
+    const message = document.getElementById("message");
+
+    function showMessage(text, type = "info") {
+      message.textContent = text;
+      message.className = type;
+    }
+
+    // Already signed-in users can continue to their HR dashboard.
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.replace("hr-dashboard.html");
+      }
+    });
+
+    // Handle errors returned after Google redirects back.
+    try {
+      await getRedirectResult(auth);
+    } catch (error) {
+      console.error("Google login error:", error);
+
+      const friendlyMessages = {
+        "auth/unauthorized-domain":
+          "This website domain is not authorized in Firebase.",
+        "auth/operation-not-allowed":
+          "Google sign-in is not enabled in Firebase.",
+        "auth/network-request-failed":
+          "Network problem. Please check your internet."
+      };
+
+      showMessage(
+        friendlyMessages[error.code] ||
+        "Google sign-in failed: " + error.message,
+        "error"
+      );
+    }
+
+    loginButton.addEventListener("click", async () => {
+      loginButton.disabled = true;
+      showMessage("Opening Google sign-in...", "info");
+
+      try {
+        await signInWithRedirect(auth, provider);
+      } catch (error) {
+        console.error(error);
+
+        showMessage(
+          "Login failed: " + error.message,
+          "error"
+        );
+
+        loginButton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

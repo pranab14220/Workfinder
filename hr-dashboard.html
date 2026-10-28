@@ -1,0 +1,875 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f172a">
+<title>Work Finder - HR Dashboard</title>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --bg:#f1f5f9;
+  --card:#fff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --primary:#2563eb;
+  --border:#e2e8f0;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{
+  background:#0f172a;color:#fff;padding:15px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;position:sticky;top:0;z-index:5;
+}
+.brand{font-size:20px;font-weight:800}
+.brand span{color:#60a5fa}
+.top-actions{display:flex;align-items:center;gap:10px}
+.user-email{font-size:12px;color:#cbd5e1;overflow-wrap:anywhere}
+.container{max-width:1100px;margin:22px auto;padding:0 14px}
+.panel,.stat,.job-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:18px;
+}
+.panel{margin-bottom:18px}
+h1{font-size:25px;margin:0 0 8px}
+h2{font-size:19px;margin:0 0 16px}
+h3{font-size:17px;margin:0 0 8px}
+.muted{color:var(--muted);font-size:13px;line-height:1.5}
+.stats{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;margin:18px 0;
+}
+.stat .number{font-size:27px;font-weight:800;margin-top:9px}
+.stat .label{color:var(--muted);font-size:13px}
+.stat i{color:var(--primary)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.tab{
+  border:1px solid var(--border);border-radius:9px;
+  background:#fff;padding:10px 14px;color:var(--text);
+}
+.tab.active{background:#0f172a;color:#fff;border-color:#0f172a}
+.form-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:13px;
+}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.full{grid-column:1/-1}
+label{font-size:13px;font-weight:700}
+input,select,textarea{
+  width:100%;padding:11px;border:1px solid #cbd5e1;
+  border-radius:8px;background:#fff;color:var(--text);
+}
+textarea{min-height:100px;resize:vertical}
+.btn{
+  border:0;border-radius:9px;padding:11px 15px;
+  font-weight:700;display:inline-flex;align-items:center;
+  justify-content:center;gap:8px;
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-dark{background:#0f172a;color:#fff}
+.btn-light{background:#e2e8f0;color:#0f172a}
+.btn-danger{background:#fee2e2;color:#991b1b}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.job-list{display:grid;gap:14px}
+.job-card h3{overflow-wrap:anywhere}
+.job-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.badge{
+  display:inline-block;padding:5px 9px;border-radius:20px;
+  font-size:11px;font-weight:800;background:#e2e8f0;color:#334155;
+}
+.badge.approved{background:#dcfce7;color:#166534}
+.badge.pending{background:#fef3c7;color:#92400e}
+.badge.rejected{background:#fee2e2;color:#991b1b}
+.badge.review{background:#dbeafe;color:#1d4ed8}
+.details{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;margin-top:14px;
+}
+.detail{font-size:13px;overflow-wrap:anywhere}
+.detail strong{display:block;color:var(--muted);font-size:11px;margin-bottom:3px}
+.description{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
+.empty,.loading{text-align:center;padding:28px 12px;color:var(--muted)}
+.notice{
+  border-radius:9px;padding:12px;margin-bottom:14px;
+  font-size:13px;line-height:1.5;display:none;overflow-wrap:anywhere;
+}
+.notice.error{display:block;background:#fee2e2;color:#991b1b}
+.notice.success{display:block;background:#dcfce7;color:#166534}
+.login-wrap{
+  max-width:430px;margin:70px auto;padding:22px;
+}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
+@media(max-width:650px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form-grid,.details{grid-template-columns:1fr}
+  .field.full{grid-column:auto}
+  .topbar{padding:13px}
+  .brand{font-size:17px}
+  .user-email{max-width:125px}
+  .container{margin-top:15px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><i class="fa-solid fa-briefcase"></i> Work <span>Finder</span></div>
+  <div class="top-actions">
+    <div id="userEmail" class="user-email"></div>
+    <button id="logoutBtn" class="btn btn-light hidden">
+      <i class="fa-solid fa-right-from-bracket"></i> Logout
+    </button>
+  </div>
+</header>
+
+<section id="loginSection" class="login-wrap panel hidden">
+  <h1>HR Login</h1>
+  <p class="muted">Sign in with the Google account you use for Work Finder HR.</p>
+  <div id="loginNotice" class="notice"></div>
+  <button id="googleLoginBtn" class="btn btn-primary" style="width:100%">
+    <i class="fa-brands fa-google"></i> Sign in with Google
+  </button>
+</section>
+
+<main id="dashboard" class="container hidden">
+  <section class="panel">
+    <h1>HR Dashboard</h1>
+    <p class="muted">Manage your job listings, track their status and request changes to approved jobs.</p>
+    <div id="notice" class="notice"></div>
+
+    <div class="stats">
+      <div class="stat">
+        <i class="fa-solid fa-layer-group"></i>
+        <div class="label">My Total Jobs</div>
+        <div id="totalCount" class="number">0</div>
+      </div>
+      <div class="stat">
+        <i class="fa-solid fa-clock"></i>
+        <div class="label">Pending</div>
+        <div id="pendingCount" class="number">0</div>
+      </div>
+      <div class="stat">
+        <i class="fa-solid fa-circle-check"></i>
+        <div class="label">Approved</div>
+        <div id="approvedCount" class="number">0</div>
+      </div>
+      <div class="stat">
+        <i class="fa-solid fa-circle-xmark"></i>
+        <div class="label">Rejected</div>
+        <div id="rejectedCount" class="number">0</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="postJobSection">
+    <h2><i class="fa-solid fa-plus-circle"></i> Post a New Job</h2>
+    <p class="muted">Your job will be sent to the admin for review. It will not become public until approved.</p>
+
+    <form id="jobForm">
+      <div class="form-grid">
+        <div class="field">
+          <label for="jobTitle">Job Title *</label>
+          <input id="jobTitle" maxlength="120" required placeholder="e.g. Office Assistant">
+        </div>
+        <div class="field">
+          <label for="companyName">Company Name *</label>
+          <input id="companyName" maxlength="120" required>
+        </div>
+        <div class="field">
+          <label for="salary">Salary</label>
+          <input id="salary" maxlength="100" placeholder="e.g. ₹12,000 per month">
+        </div>
+        <div class="field">
+          <label for="jobType">Job Type</label>
+          <select id="jobType">
+            <option value="">Select job type</option>
+            <option>Full Time</option><option>Part Time</option>
+            <option>Internship</option><option>Freelance</option>
+            <option>Contract</option><option>Temporary</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="state">State</label>
+          <input id="state" maxlength="100" placeholder="e.g. West Bengal">
+        </div>
+        <div class="field">
+          <label for="city">City</label>
+          <input id="city" maxlength="100" placeholder="e.g. Kolkata">
+        </div>
+        <div class="field">
+          <label for="area">Area</label>
+          <input id="area" maxlength="150">
+        </div>
+        <div class="field">
+          <label for="landmark">Landmark</label>
+          <input id="landmark" maxlength="150">
+        </div>
+        <div class="field">
+          <label for="workType">Work Type</label>
+          <select id="workType">
+            <option value="">Select</option>
+            <option>Office</option><option>Field Work</option>
+            <option>Remote</option><option>Hybrid</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="workingMode">Working Mode</label>
+          <select id="workingMode">
+            <option value="">Select</option>
+            <option>On-site</option><option>Remote</option><option>Hybrid</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="workingShifts">Working Shifts</label>
+          <input id="workingShifts" maxlength="100" placeholder="e.g. Day / Night">
+        </div>
+        <div class="field">
+          <label for="gender">Gender</label>
+          <select id="gender">
+            <option value="">Any / Not specified</option>
+            <option>Any</option><option>Male</option><option>Female</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="education">Education</label>
+          <input id="education" maxlength="150" placeholder="e.g. 12th Pass">
+        </div>
+        <div class="field">
+          <label for="experience">Experience</label>
+          <input id="experience" maxlength="100" placeholder="e.g. Fresher">
+        </div>
+        <div class="field">
+          <label for="contactNumber">Contact Number</label>
+          <input id="contactNumber" type="tel" maxlength="25">
+        </div>
+        <div class="field">
+          <label for="whatsapp">WhatsApp Number</label>
+          <input id="whatsapp" type="tel" maxlength="25">
+        </div>
+        <div class="field">
+          <label for="email">Contact Email</label>
+          <input id="email" type="email" maxlength="150">
+        </div>
+        <div class="field">
+          <label for="expiryDate">Expiry Date (optional)</label>
+          <input id="expiryDate" type="date">
+        </div>
+        <div class="field full">
+          <label for="jobDescription">Job Description *</label>
+          <textarea id="jobDescription" maxlength="5000" required placeholder="Describe the responsibilities and requirements..."></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="postBtn" class="btn btn-primary" type="submit">
+          <i class="fa-solid fa-paper-plane"></i> Submit Job for Approval
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h2><i class="fa-solid fa-list"></i> My Jobs</h2>
+    <div class="tabs">
+      <button class="tab active" data-filter="all">All Jobs</button>
+      <button class="tab" data-filter="pending">Pending</button>
+      <button class="tab" data-filter="approved">Approved</button>
+      <button class="tab" data-filter="rejected">Rejected</button>
+    </div>
+    <div id="jobsList" class="job-list">
+      <div class="loading">Loading your jobs...</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2><i class="fa-solid fa-pen-to-square"></i> My Edit Requests</h2>
+    <p class="muted">Changes to approved jobs need admin approval before they become live.</p>
+    <div id="editRequestsList" class="job-list">
+      <div class="loading">Loading edit requests...</div>
+    </div>
+  </section>
+</main>
+
+<footer>Work Finder · HR Portal</footer>
+
+<script type="module">
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth, GoogleAuthProvider, signInWithPopup,
+  onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore, collection, doc, addDoc, getDocs,
+  query, where, writeBatch, serverTimestamp, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCCBMrDXwhV8-2kz-FaMTYmLEODXRGNAdU",
+  authDomain: "workfinder2-a5f80.firebaseapp.com",
+  projectId: "workfinder2-a5f80"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+const $ = id => document.getElementById(id);
+
+let currentUser = null;
+let allJobs = [];
+let allRequests = [];
+let activeFilter = "all";
+let stopJobsListener = null;
+let stopRequestsListener = null;
+let busy = false;
+
+/*
+ * Only these normal job fields can be edited through this HR interface.
+ * HR cannot change status, hrUid, plan, priority or approval fields.
+ */
+const EDITABLE_FIELDS = [
+  {key:"Job Title", id:"jobTitle", label:"Job Title", required:true, max:120},
+  {key:"Company Name", id:"companyName", label:"Company Name", required:true, max:120},
+  {key:"Salary", id:"salary", label:"Salary", max:100},
+  {key:"Job Type", id:"jobType", label:"Job Type", max:80},
+  {key:"State", id:"state", label:"State", max:100},
+  {key:"City", id:"city", label:"City", max:100},
+  {key:"Area", id:"area", label:"Area", max:150},
+  {key:"Landmark", id:"landmark", label:"Landmark", max:150},
+  {key:"Work Type", id:"workType", label:"Work Type", max:80},
+  {key:"Working Mode", id:"workingMode", label:"Working Mode", max:80},
+  {key:"Working Shifts", id:"workingShifts", label:"Working Shifts", max:100},
+  {key:"Gender", id:"gender", label:"Gender", max:50},
+  {key:"Education", id:"education", label:"Education", max:150},
+  {key:"Experience", id:"experience", label:"Experience", max:100},
+  {key:"Contact Number", id:"contactNumber", label:"Contact Number", max:25},
+  {key:"WhatsApp", id:"whatsapp", label:"WhatsApp", max:25},
+  {key:"Email", id:"email", label:"Contact Email", max:150},
+  {key:"Job Description", id:"jobDescription", label:"Job Description", required:true, max:5000},
+  {key:"Expiry Date", id:"expiryDate", label:"Expiry Date", max:30}
+];
+
+function showNotice(message, type="error", target="notice"){
+  const el = $(target);
+  if(!el) return;
+  el.textContent = message;
+  el.className = "notice " + type;
+  el.style.display = "block";
+}
+
+function clearNotice(target="notice"){
+  const el = $(target);
+  if(el){
+    el.textContent = "";
+    el.className = "notice";
+    el.style.display = "none";
+  }
+}
+
+function safe(value){
+  return value === undefined || value === null ? "" : String(value);
+}
+
+function field(job, name){
+  return safe(job[name]);
+}
+
+function normalizedStatus(value){
+  return safe(value).trim().toLowerCase();
+}
+
+function statusBadge(status){
+  const s = normalizedStatus(status);
+  const label = s ? s.charAt(0).toUpperCase()+s.slice(1) : "Unknown";
+  const css = ["approved","pending","rejected"].includes(s) ? s : "";
+  return `<span class="badge ${css}">${label}</span>`;
+}
+
+function escapeHTML(value){
+  return safe(value).replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[char]);
+}
+
+function dateText(value){
+  if(!value) return "—";
+  if(typeof value === "string") return value;
+  if(value.toDate){
+    return value.toDate().toLocaleString("en-IN");
+  }
+  return safe(value);
+}
+
+function jobCard(job){
+  const status = normalizedStatus(job.status);
+  const request = allRequests.find(r =>
+    r.originalJobId === job.id && normalizedStatus(r.status) === "pending"
+  );
+
+  const isApproved = status === "approved";
+  const canRequestEdit = isApproved && !job.editPending && !request;
+
+  const details = [
+    ["Salary",job.Salary],
+    ["Job Type",job["Job Type"]],
+    ["Location",[job.Area,job.City,job.State].filter(Boolean).join(", ")],
+    ["Landmark",job.Landmark],
+    ["Work Type",job["Work Type"]],
+    ["Working Mode",job["Working Mode"]],
+    ["Working Shifts",job["Working Shifts"]],
+    ["Gender",job.Gender],
+    ["Education",job.Education],
+    ["Experience",job.Experience],
+    ["Contact Number",job["Contact Number"]],
+    ["WhatsApp",job.WhatsApp],
+    ["Email",job.Email],
+    ["Expiry Date",job["Expiry Date"]]
+  ];
+
+  return `
+    <article class="job-card">
+      <div class="job-top">
+        <div>
+          <h3>${escapeHTML(job["Job Title"] || "Untitled Job")}</h3>
+          <div class="muted">${escapeHTML(job["Company Name"] || "Company not specified")}</div>
+        </div>
+        <div>${statusBadge(job.status)}</div>
+      </div>
+      <div class="details">
+        ${details.map(([label,value]) => `
+          <div class="detail">
+            <strong>${escapeHTML(label)}</strong>${escapeHTML(value || "—")}
+          </div>
+        `).join("")}
+      </div>
+      <div style="margin-top:14px">
+        <strong style="font-size:12px">Job Description</strong>
+        <div class="description">${escapeHTML(job["Job Description"] || "—")}</div>
+      </div>
+      <p class="muted">Job ID: ${escapeHTML(job.id)}</p>
+      ${job.editPending ? `
+        <p class="muted"><i class="fa-solid fa-clock"></i> An edit request is awaiting admin review.</p>
+      ` : ""}
+      ${request ? `
+        <p class="muted">Edit request status: ${statusBadge(request.status).replace(/<span/g,'<span style="vertical-align:middle"')}</p>
+      ` : ""}
+      <div class="actions">
+        ${canRequestEdit ? `
+          <button class="btn btn-primary" data-edit="${escapeHTML(job.id)}">
+            <i class="fa-solid fa-pen"></i> Request Job Edit
+          </button>
+        ` : ""}
+      </div>
+      <div id="editForm-${escapeHTML(job.id)}"></div>
+    </article>
+  `;
+}
+
+function renderJobs(){
+  const list = $("jobsList");
+  let jobs = [...allJobs];
+
+  if(activeFilter !== "all"){
+    jobs = jobs.filter(j => normalizedStatus(j.status) === activeFilter);
+  }
+
+  $("totalCount").textContent = allJobs.length;
+  $("pendingCount").textContent =
+    allJobs.filter(j => normalizedStatus(j.status) === "pending").length;
+  $("approvedCount").textContent =
+    allJobs.filter(j => normalizedStatus(j.status) === "approved").length;
+  $("rejectedCount").textContent =
+    allJobs.filter(j => normalizedStatus(j.status) === "rejected").length;
+
+  if(!jobs.length){
+    list.innerHTML = `<div class="empty">No jobs found in this section.</div>`;
+    return;
+  }
+
+  list.innerHTML = jobs.map(jobCard).join("");
+
+  list.querySelectorAll("[data-edit]").forEach(button => {
+    button.addEventListener("click", () => {
+      const job = allJobs.find(j => j.id === button.dataset.edit);
+      if(job) renderEditForm(job);
+    });
+  });
+}
+
+function renderEditForm(job){
+  const holder = $("editForm-" + job.id);
+  if(!holder) return;
+
+  if(normalizedStatus(job.status) !== "approved" ||
+     job.editPending){
+    showNotice("This job cannot be edited right now. It may already have a pending edit request.");
+    return;
+  }
+
+  const existingRequest = allRequests.find(r =>
+    r.originalJobId === job.id && normalizedStatus(r.status) === "pending"
+  );
+  if(existingRequest){
+    showNotice("An edit request for this job is already pending.");
+    return;
+  }
+
+  holder.innerHTML = `
+    <div class="panel" style="margin-top:15px;padding:14px">
+      <h3>Request Changes</h3>
+      <p class="muted">Your changes will be sent to the admin. The current approved listing remains live until the request is approved.</p>
+      <form id="editFormActual">
+        <div class="form-grid">
+          ${EDITABLE_FIELDS.map(f => {
+            const value = safe(job[f.key]);
+            const isLong = f.key === "Job Description";
+            const isSelect = ["Job Type","Work Type","Working Mode","Gender"].includes(f.key);
+            let input = "";
+
+            if(isLong){
+              input = `<textarea id="edit-${f.id}" maxlength="${f.max}" ${f.required ? "required" : ""}>${escapeHTML(value)}</textarea>`;
+            }else if(isSelect){
+              let options = [];
+              if(f.key === "Job Type") options = ["Full Time","Part Time","Internship","Freelance","Contract","Temporary"];
+              if(f.key === "Work Type") options = ["Office","Field Work","Remote","Hybrid"];
+              if(f.key === "Working Mode") options = ["On-site","Remote","Hybrid"];
+              if(f.key === "Gender") options = ["Any","Male","Female"];
+              input = `<select id="edit-${f.id}">
+                <option value="">Select / Not specified</option>
+                ${options.map(o => `<option ${value===o?"selected":""}>${escapeHTML(o)}</option>`).join("")}
+                ${value && !options.includes(value) ? `<option selected>${escapeHTML(value)}</option>` : ""}
+              </select>`;
+            }else{
+              const type = f.key === "Expiry Date" ? "date" :
+                f.key === "Email" ? "email" :
+                ["Contact Number","WhatsApp"].includes(f.key) ? "tel" : "text";
+              input = `<input id="edit-${f.id}" type="${type}" maxlength="${f.max}"
+                value="${escapeHTML(value)}" ${f.required ? "required" : ""}>`;
+            }
+
+            return `<div class="field ${isLong ? "full" : ""}">
+              <label for="edit-${f.id}">${escapeHTML(f.label)}${f.required ? " *" : ""}</label>
+              ${input}
+            </div>`;
+          }).join("")}
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" type="submit" id="sendEditBtn">
+            <i class="fa-solid fa-paper-plane"></i> Send Edit Request
+          </button>
+          <button class="btn btn-light" type="button" id="cancelEditBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  $("cancelEditBtn").addEventListener("click", () => holder.innerHTML = "");
+
+  $("editFormActual").addEventListener("submit", async event => {
+    event.preventDefault();
+    if(busy) return;
+
+    const changes = {};
+    for(const f of EDITABLE_FIELDS){
+      const input = $("edit-" + f.id);
+      const value = input ? input.value.trim() : "";
+      if(f.required && !value){
+        showNotice(`${f.label} is required.`);
+        input?.focus();
+        return;
+      }
+      if(value.length > f.max){
+        showNotice(`${f.label} is too long.`);
+        input?.focus();
+        return;
+      }
+      changes[f.key] = value;
+    }
+
+    // Do not create a request when nothing has changed.
+    const changed = {};
+    for(const f of EDITABLE_FIELDS){
+      if(safe(job[f.key]) !== safe(changes[f.key])){
+        changed[f.key] = changes[f.key];
+      }
+    }
+
+    if(Object.keys(changed).length === 0){
+      showNotice("You have not changed any job details.");
+      return;
+    }
+
+    const button = $("sendEditBtn");
+    button.disabled = true;
+    busy = true;
+    clearNotice();
+
+    try{
+      await submitEditRequest(job, changed);
+      holder.innerHTML = "";
+      showNotice("Your edit request has been sent to the admin for review.", "success");
+    }catch(error){
+      console.error(error);
+      showNotice(error.code === "permission-denied"
+        ? "Firebase permissions blocked this request. Please check the Firestore Rules."
+        : "Could not submit the edit request: " + (error.message || "Unknown error"));
+      button.disabled = false;
+    }finally{
+      busy = false;
+    }
+  });
+}
+
+async function submitEditRequest(job, changes){
+  if(!currentUser) throw new Error("Please sign in again.");
+
+  // Re-check ownership and status immediately before submitting.
+  if(job.hrUid !== currentUser.uid){
+    throw new Error("You do not own this job.");
+  }
+  if(normalizedStatus(job.status) !== "approved" || job.editPending){
+    throw new Error("This job is no longer available for editing.");
+  }
+
+  const requestRef = doc(collection(db, "jobEditRequests"));
+  const jobRef = doc(db, "jobs", job.id);
+  const batch = writeBatch(db);
+
+  batch.set(requestRef, {
+    originalJobId: job.id,
+    originalJobTitle: safe(job["Job Title"]),
+    hrUid: currentUser.uid,
+    status: "pending",
+    proposedChanges: changes,
+    createdAt: serverTimestamp()
+  });
+
+  // The Firestore rules should allow this HR update only when the matching
+  // edit request is created in the same atomic batch.
+  batch.update(jobRef, {
+    editPending: true,
+    pendingEditRequestId: requestRef.id
+  });
+
+  await batch.commit();
+}
+
+function renderEditRequests(){
+  const list = $("editRequestsList");
+
+  if(!allRequests.length){
+    list.innerHTML = `<div class="empty">You have not submitted any edit requests yet.</div>`;
+    return;
+  }
+
+  const sorted = [...allRequests].sort((a,b) => {
+    const ta = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+    const tb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+    return tb - ta;
+  });
+
+  list.innerHTML = sorted.map(request => {
+    const changes = request.proposedChanges || {};
+    const changesHTML = Object.entries(changes).map(([key,value]) => `
+      <div class="detail">
+        <strong>${escapeHTML(key)}</strong>${escapeHTML(value || "—")}
+      </div>
+    `).join("");
+
+    const job = allJobs.find(j => j.id === request.originalJobId);
+    return `
+      <article class="job-card">
+        <div class="job-top">
+          <div>
+            <h3>${escapeHTML(request.originalJobTitle || job?.["Job Title"] || "Job Edit Request")}</h3>
+            <p class="muted">Job ID: ${escapeHTML(request.originalJobId || "—")}</p>
+          </div>
+          ${statusBadge(request.status)}
+        </div>
+        <p class="muted">Submitted: ${escapeHTML(dateText(request.createdAt))}</p>
+        <h3 style="margin-top:14px">Proposed Changes</h3>
+        <div class="details">${changesHTML || '<div class="muted">No change details available.</div>'}</div>
+        ${normalizedStatus(request.status) === "rejected" ? `
+          <p class="muted">The edit was rejected. Your previous approved job should remain unchanged.</p>
+        ` : ""}
+        ${normalizedStatus(request.status) === "approved" ? `
+          <p class="muted">Your edit was approved by the admin.</p>
+        ` : ""}
+      </article>
+    `;
+  }).join("");
+}
+
+function startListeners(user){
+  stopListeners();
+
+  const jobsQuery = query(
+    collection(db, "jobs"),
+    where("hrUid", "==", user.uid)
+  );
+
+  stopJobsListener = onSnapshot(jobsQuery, snapshot => {
+    allJobs = snapshot.docs.map(d => ({id:d.id, ...d.data()}));
+    renderJobs();
+    renderEditRequests();
+  }, error => {
+    console.error("Jobs listener:", error);
+    showNotice("Could not load your jobs. Check Firestore Rules and the hrUid field.");
+    $("jobsList").innerHTML = `<div class="empty">Unable to load jobs.</div>`;
+  });
+
+  const requestsQuery = query(
+    collection(db, "jobEditRequests"),
+    where("hrUid", "==", user.uid)
+  );
+
+  stopRequestsListener = onSnapshot(requestsQuery, snapshot => {
+    allRequests = snapshot.docs.map(d => ({id:d.id, ...d.data()}));
+    renderJobs();
+    renderEditRequests();
+  }, error => {
+    console.error("Edit request listener:", error);
+    $("editRequestsList").innerHTML =
+      `<div class="empty">Could not load edit requests. Check the jobEditRequests read rules.</div>`;
+  });
+}
+
+function stopListeners(){
+  if(stopJobsListener) stopJobsListener();
+  if(stopRequestsListener) stopRequestsListener();
+  stopJobsListener = null;
+  stopRequestsListener = null;
+}
+
+$("googleLoginBtn").addEventListener("click", async () => {
+  clearNotice("loginNotice");
+  $("googleLoginBtn").disabled = true;
+  try{
+    await signInWithPopup(auth, googleProvider);
+  }catch(error){
+    console.error(error);
+    showNotice(error.message || "Google login failed.", "error", "loginNotice");
+  }finally{
+    $("googleLoginBtn").disabled = false;
+  }
+});
+
+$("logoutBtn").addEventListener("click", async () => {
+  try{
+    stopListeners();
+    await signOut(auth);
+  }catch(error){
+    showNotice("Logout failed: " + error.message);
+  }
+});
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+
+  if(!user){
+    stopListeners();
+    allJobs = [];
+    allRequests = [];
+    $("dashboard").classList.add("hidden");
+    $("loginSection").classList.remove("hidden");
+    $("logoutBtn").classList.add("hidden");
+    $("userEmail").textContent = "";
+    return;
+  }
+
+  $("loginSection").classList.add("hidden");
+  $("dashboard").classList.remove("hidden");
+  $("logoutBtn").classList.remove("hidden");
+  $("userEmail").textContent = user.email || "Signed in";
+  startListeners(user);
+});
+
+$("jobForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if(busy || !currentUser) return;
+
+  const button = $("postBtn");
+  button.disabled = true;
+  busy = true;
+  clearNotice();
+
+  const value = id => $(id).value.trim();
+
+  const jobData = {
+    "Job Title": value("jobTitle"),
+    "Company Name": value("companyName"),
+    "Salary": value("salary"),
+    "Job Type": value("jobType"),
+    "State": value("state"),
+    "City": value("city"),
+    "Area": value("area"),
+    "Landmark": value("landmark"),
+    "Work Type": value("workType"),
+    "Working Mode": value("workingMode"),
+    "Working Shifts": value("workingShifts"),
+    "Gender": value("gender"),
+    "Education": value("education"),
+    "Experience": value("experience"),
+    "Contact Number": value("contactNumber"),
+    "WhatsApp": value("whatsapp"),
+    "Email": value("email"),
+    "Job Description": value("jobDescription"),
+    "Expiry Date": value("expiryDate"),
+    "hrUid": currentUser.uid,
+    "hrEmail": currentUser.email || "",
+    "status": "pending",
+    "editPending": false,
+    "createdAt": serverTimestamp(),
+    "Post Date": new Date().toISOString().slice(0,10),
+    "Plan": "Basic",
+    "duration": 3,
+    "priority": 0
+  };
+
+  try{
+    if(!jobData["Job Title"] || !jobData["Company Name"] ||
+       !jobData["Job Description"]){
+      throw new Error("Please fill all required fields.");
+    }
+
+    await addDoc(collection(db, "jobs"), jobData);
+    $("jobForm").reset();
+    showNotice("Job submitted successfully. It is pending admin approval.", "success");
+    $("postJobSection").scrollIntoView({behavior:"smooth",block:"start"});
+  }catch(error){
+    console.error(error);
+    showNotice(error.code === "permission-denied"
+      ? "Firebase blocked this job submission. Check the jobs create rules."
+      : "Could not submit job: " + (error.message || "Unknown error"));
+  }finally{
+    busy = false;
+    button.disabled = false;
+  }
+});
+
+document.querySelectorAll("[data-filter]").forEach(button => {
+  button.addEventListener("click", () => {
+    activeFilter = button.dataset.filter;
+    document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+    button.classList.add("active");
+    renderJobs();
+  });
+});
+</script>
+</body>
+</html>

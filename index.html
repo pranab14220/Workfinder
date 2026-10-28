@@ -6,183 +6,88 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0f172a">
 <title>Work Finder - Find Your Job</title>
-
-<link rel="stylesheet"
- href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;background:#e2e8f0;
-  font-family:Arial,"Segoe UI",sans-serif;color:#0f172a
-}
+body{margin:0;background:#e2e8f0;font-family:Arial,"Segoe UI",sans-serif;color:#0f172a}
 button,input,select{font:inherit}
 button,a{-webkit-tap-highlight-color:transparent}
-.app{
-  max-width:600px;min-height:100vh;
-  margin:auto;background:#f8fafc
-}
-.header{
-  height:64px;padding:0 16px;background:#0f172a;
-  color:white;display:flex;align-items:center;
-  justify-content:space-between;gap:14px;
-  position:sticky;top:0;z-index:20
-}
-.header button{
-  border:0;background:none;color:white;
-  font-size:20px;cursor:pointer;padding:8px
-}
+.app{max-width:600px;min-height:100vh;margin:auto;background:#f8fafc}
+.header{height:64px;padding:0 16px;background:#0f172a;color:white;display:flex;align-items:center;justify-content:space-between;gap:14px;position:sticky;top:0;z-index:20}
+.header button{border:0;background:none;color:white;font-size:20px;cursor:pointer;padding:8px}
 .logo{font-size:20px;font-weight:bold;white-space:nowrap}
-.search{
-  display:flex;align-items:center;gap:6px;min-width:0
-}
-.search input{
-  display:none;width:155px;max-width:45vw;
-  border:0;border-radius:20px;padding:10px;
-  outline:none;background:white;color:#0f172a
-}
+.search{display:flex;align-items:center;gap:6px;min-width:0}
+.search input{display:none;width:155px;max-width:45vw;border:0;border-radius:20px;padding:10px;outline:none;background:white;color:#0f172a}
 .search.open input{display:block}
-.filters{
-  display:flex;gap:8px;overflow-x:auto;padding:12px;
-  background:white;border-bottom:1px solid #e2e8f0;
-  position:sticky;top:64px;z-index:10
-}
-.filters select{
-  min-width:115px;max-width:155px;
-  padding:9px;border:1px solid #cbd5e1;
-  border-radius:8px;background:white;color:#334155
-}
-.filters button{
-  flex-shrink:0;border:0;border-radius:8px;
-  padding:8px 12px;background:#e2e8f0;color:#0f172a
-}
+.filters{display:flex;gap:8px;overflow-x:auto;padding:12px;background:white;border-bottom:1px solid #e2e8f0;position:sticky;top:64px;z-index:10}
+.filters select{min-width:115px;max-width:155px;padding:9px;border:1px solid #cbd5e1;border-radius:8px;background:white;color:#334155}
+.filters button{flex-shrink:0;border:0;border-radius:8px;padding:8px 12px;background:#e2e8f0;color:#0f172a}
 .container{padding:12px}
 .heading{font-size:18px;font-weight:bold;margin:8px 2px}
 #resultCount{font-size:13px;color:#64748b;margin:6px 2px 14px}
-.job{
-  background:white;border:1px solid #e2e8f0;
-  border-radius:14px;padding:16px;margin-bottom:14px;
-  box-shadow:0 4px 12px #0f172a0b
-}
+.job{background:white;border:1px solid #e2e8f0;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 4px 12px #0f172a0b}
 .jobTop{display:flex;align-items:flex-start;gap:10px}
 .jobTitle{font-size:19px;font-weight:bold;line-height:1.35;flex:1}
 .actions{display:flex;gap:14px;flex-shrink:0}
-.iconBtn{
-  border:0;background:none;padding:2px;
-  font-size:19px;color:#64748b;cursor:pointer
-}
+.iconBtn{border:0;background:none;padding:2px;font-size:19px;color:#64748b;cursor:pointer}
 .iconBtn.saved{color:#f59e0b}
 .company{margin-top:7px;color:#475569;font-size:14px}
 .salary{font-size:19px;color:#16a34a;font-weight:bold;margin:12px 0}
 .info{font-size:14px;color:#334155;line-height:1.6;margin:7px 0}
 .info i{width:20px;color:#64748b}
-.description{
-  white-space:pre-wrap;overflow-wrap:anywhere;
-  font-size:14px;line-height:1.6;color:#475569;margin-top:12px
-}
+.description{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6;color:#475569;margin-top:12px}
 .details{display:none;border-top:1px solid #e2e8f0;margin-top:12px;padding-top:8px}
 .details.show{display:block}
-.readBtn{
-  width:100%;padding:11px;margin-top:13px;
-  border:0;border-radius:8px;background:#0f172a;
-  color:white;font-weight:bold;cursor:pointer
-}
+.readBtn{width:100%;padding:11px;margin-top:13px;border:0;border-radius:8px;background:#0f172a;color:white;font-weight:bold;cursor:pointer}
 .contact{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
-.contact a{
-  text-decoration:none;color:white;padding:10px 13px;
-  border-radius:8px;font-size:14px;font-weight:bold
-}
-.call{background:#e11d48}.whatsapp{background:#16a34a}
-.email{background:#0284c7}
-#message{
-  padding:35px 12px;text-align:center;
-  color:#64748b;line-height:1.6
-}
-.spinner{
-  width:25px;height:25px;border:3px solid #cbd5e1;
-  border-top-color:#0f172a;border-radius:50%;
-  animation:spin .8s linear infinite;margin:0 auto 12px
-}
+.contact a{text-decoration:none;color:white;padding:10px 13px;border-radius:8px;font-size:14px;font-weight:bold}
+.call{background:#e11d48}.whatsapp{background:#16a34a}.email{background:#0284c7}
+#message{padding:35px 12px;text-align:center;color:#64748b;line-height:1.6}
+.spinner{width:25px;height:25px;border:3px solid #cbd5e1;border-top-color:#0f172a;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.sidebar{
-  position:fixed;inset:0 auto 0 0;width:260px;max-width:80vw;
-  background:#0f172a;color:white;z-index:40;
-  padding:24px 12px;transform:translateX(-105%);
-  transition:transform .25s;overflow-y:auto
-}
+.sidebar{position:fixed;inset:0 auto 0 0;width:260px;max-width:80vw;background:#0f172a;color:white;z-index:40;padding:24px 12px;transform:translateX(-105%);transition:transform .25s;overflow-y:auto}
 .sidebar.open{transform:translateX(0)}
-.profile{
-  padding:18px 12px 25px;border-bottom:1px solid #334155;
-  margin-bottom:12px
-}
+.profile{padding:18px 12px 25px;border-bottom:1px solid #334155;margin-bottom:12px}
 .profile i{font-size:28px;margin-bottom:10px}
 .profile div{font-weight:bold;font-size:18px}
 .profile small{display:block;margin-top:6px;color:#cbd5e1}
-.navBtn{
-  display:flex;align-items:center;gap:12px;width:100%;
-  padding:14px 12px;margin:3px 0;border:0;border-radius:8px;
-  background:transparent;color:#e2e8f0;text-align:left;
-  text-decoration:none;cursor:pointer;font-size:15px
-}
+.navBtn{display:flex;align-items:center;gap:12px;width:100%;padding:14px 12px;margin:3px 0;border:0;border-radius:8px;background:transparent;color:#e2e8f0;text-align:left;text-decoration:none;cursor:pointer;font-size:15px}
 .navBtn.active,.navBtn:hover{background:#1e293b;color:#38bdf8}
-.badge{
-  margin-left:auto;background:#ef4444;color:white;
-  border-radius:20px;padding:2px 7px;font-size:12px
-}
-#overlay{
-  display:none;position:fixed;inset:0;background:#0008;
-  backdrop-filter:blur(2px);z-index:30
-}
+.badge{margin-left:auto;background:#ef4444;color:white;border-radius:20px;padding:2px 7px;font-size:12px}
+#overlay{display:none;position:fixed;inset:0;background:#0008;backdrop-filter:blur(2px);z-index:30}
 #overlay.open{display:block}
 .footer{text-align:center;padding:24px;color:#94a3b8;font-size:12px}
-@media(max-width:360px){
-  .header{padding:0 9px;gap:6px}
-  .logo{font-size:17px}
-  .job{padding:13px}
-  .jobTitle{font-size:17px}
-}
+@media(max-width:360px){.header{padding:0 9px;gap:6px}.logo{font-size:17px}.job{padding:13px}.jobTitle{font-size:17px}}
 </style>
 </head>
 
 <body>
 <div class="app">
+<header class="header">
+  <button id="menuBtn" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+  <div class="logo">Work Finder</div>
+  <div class="search" id="searchBox">
+    <input id="searchInput" type="search" placeholder="Search jobs..." aria-label="Search jobs">
+    <button id="searchBtn" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+  </div>
+</header>
 
-  <header class="header">
-    <button id="menuBtn" aria-label="Open menu">
-      <i class="fa-solid fa-bars"></i>
-    </button>
+<nav class="filters">
+  <select id="filterType"><option value="">All Job Types</option></select>
+  <select id="filterState"><option value="">All States</option></select>
+  <select id="filterCity"><option value="">All Cities</option></select>
+  <button id="resetBtn"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+</nav>
 
-    <div class="logo">Work Finder</div>
+<main class="container">
+  <div class="heading" id="pageHeading">Latest Jobs</div>
+  <div id="resultCount"></div>
+  <div id="message"><div class="spinner"></div>Loading jobs...</div>
+  <div id="jobs"></div>
+</main>
 
-    <div class="search" id="searchBox">
-      <input id="searchInput" type="search"
-        placeholder="Search jobs..." aria-label="Search jobs">
-      <button id="searchBtn" aria-label="Search">
-        <i class="fa-solid fa-magnifying-glass"></i>
-      </button>
-    </div>
-  </header>
-
-  <nav class="filters">
-    <select id="filterType"><option value="">All Job Types</option></select>
-    <select id="filterState"><option value="">All States</option></select>
-    <select id="filterCity"><option value="">All Cities</option></select>
-    <button id="resetBtn"><i class="fa-solid fa-rotate-left"></i> Reset</button>
-  </nav>
-
-  <main class="container">
-    <div class="heading" id="pageHeading">Latest Jobs</div>
-    <div id="resultCount"></div>
-
-    <div id="message">
-      <div class="spinner"></div>
-      Loading jobs...
-    </div>
-
-    <div id="jobs"></div>
-  </main>
-
-  <footer class="footer">Work Finder · Find jobs near you</footer>
+<footer class="footer">Work Finder · Find jobs near you</footer>
 </div>
 
 <aside class="sidebar" id="sidebar">
@@ -191,23 +96,10 @@ button,a{-webkit-tap-highlight-color:transparent}
     <div>Work Finder</div>
     <small>Find your next opportunity</small>
   </div>
-
-  <button class="navBtn active" data-page="home">
-    <i class="fa-solid fa-house"></i> Home
-  </button>
-
-  <button class="navBtn" data-page="saved">
-    <i class="fa-solid fa-bookmark"></i> Saved Jobs
-    <span class="badge" id="savedCount">0</span>
-  </button>
-
-  <a class="navBtn" href="https://pranab14220.github.io/Workfinder/">
-    <i class="fa-solid fa-globe"></i> Website Home
-  </a>
-
-  <button class="navBtn" id="closeMenu">
-    <i class="fa-solid fa-xmark"></i> Close Menu
-  </button>
+  <button class="navBtn active" data-page="home"><i class="fa-solid fa-house"></i> Home</button>
+  <button class="navBtn" data-page="saved"><i class="fa-solid fa-bookmark"></i> Saved Jobs <span class="badge" id="savedCount">0</span></button>
+  <a class="navBtn" href="https://pranab14220.github.io/Workfinder/"><i class="fa-solid fa-globe"></i> Website Home</a>
+  <button class="navBtn" id="closeMenu"><i class="fa-solid fa-xmark"></i> Close Menu</button>
 </aside>
 <div id="overlay"></div>
 
@@ -216,21 +108,19 @@ import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-  getFirestore, collection, getDocs
+  getFirestore, collection, getDocs, query, where
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* 1. Firebase configuration */
+/* Firebase configuration */
 const firebaseConfig = {
   apiKey: "AIzaSyCCBMrDXwhV8-2kz-FaMTYmLEODXRGNAdU",
   authDomain: "workfinder2-a5f80.firebaseapp.com",
   projectId: "workfinder2-a5f80"
 };
 
-/* 2. Connect to Firebase */
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* 3. Page elements */
 const jobsBox = document.getElementById("jobs");
 const message = document.getElementById("message");
 const countBox = document.getElementById("resultCount");
@@ -267,22 +157,16 @@ function saveSaved() {
 function field(job, ...names) {
   for (const name of names) {
     const value = job[name];
-    if (value !== undefined && value !== null &&
-        String(value).trim() !== "") {
+    if (value !== undefined && value !== null && String(value).trim() !== "") {
       return String(value).trim();
     }
   }
   return "";
 }
 
-/* Prevent database text from being interpreted as HTML */
 function esc(value) {
   return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   })[char]);
 }
 
@@ -291,16 +175,13 @@ function normalize(value) {
 }
 
 function uniqueValues(values) {
-  return [...new Set(values.filter(Boolean))]
-    .sort((a, b) => a.localeCompare(b));
+  return [...new Set(values.filter(Boolean))].sort((a,b) => a.localeCompare(b));
 }
 
 function fillSelect(select, values, label) {
   const previous = select.value;
   select.replaceChildren(new Option(label, ""));
-  uniqueValues(values).forEach(value => {
-    select.add(new Option(value, value));
-  });
+  uniqueValues(values).forEach(value => select.add(new Option(value, value)));
   if ([...select.options].some(option => option.value === previous)) {
     select.value = previous;
   }
@@ -308,8 +189,7 @@ function fillSelect(select, values, label) {
 
 function updateSavedCount() {
   document.getElementById("savedCount").textContent = savedIds.length;
-  document.getElementById("savedCount").style.display =
-    savedIds.length ? "inline-block" : "none";
+  document.getElementById("savedCount").style.display = savedIds.length ? "inline-block" : "none";
 }
 
 function openMenu(open) {
@@ -326,17 +206,16 @@ overlay.addEventListener("click", () => openMenu(false));
 document.getElementById("searchBtn").addEventListener("click", () => {
   const box = document.getElementById("searchBox");
   box.classList.toggle("open");
-  if (box.classList.contains("open")) searchInput.focus();
-  else {
+  if (box.classList.contains("open")) {
+    searchInput.focus();
+  } else {
     searchInput.value = "";
     renderJobs();
   }
 });
 
 searchInput.addEventListener("input", renderJobs);
-[filterType, filterState, filterCity].forEach(select => {
-  select.addEventListener("change", renderJobs);
-});
+[filterType, filterState, filterCity].forEach(select => select.addEventListener("change", renderJobs));
 
 document.getElementById("resetBtn").addEventListener("click", () => {
   searchInput.value = "";
@@ -352,104 +231,86 @@ document.querySelectorAll(".navBtn[data-page]").forEach(button => {
     document.querySelectorAll(".navBtn[data-page]").forEach(item => {
       item.classList.toggle("active", item === button);
     });
-    pageHeading.textContent =
-      currentPage === "saved" ? "Saved Jobs" : "Latest Jobs";
+    pageHeading.textContent = currentPage === "saved" ? "Saved Jobs" : "Latest Jobs";
     openMenu(false);
     renderJobs();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({top:0,behavior:"smooth"});
   });
 });
 
 function matchesFilters(item) {
   const job = item.data;
   const text = [
-    field(job, "Job Title", "JobTitle", "title"),
-    field(job, "Company Name", "CompanyName", "company"),
-    field(job, "Salary", "salary"),
-    field(job, "Job Type", "JobType"),
-    field(job, "State", "state"),
-    field(job, "City", "city"),
-    field(job, "Area", "area"),
-    field(job, "Landmark", "Landmark"),
-    field(job, "Job Description", "JobDescription", "description"),
-    field(job, "Work Type", "WorkType"),
-    field(job, "Working Mode", "WorkingMode"),
-    field(job, "Working Shifts", "WorkingShifts"),
-    field(job, "Gender", "gender"),
-    field(job, "Education", "education"),
-    field(job, "Experience", "experience")
+    field(job,"Job Title","JobTitle","title"),
+    field(job,"Company Name","CompanyName","company"),
+    field(job,"Salary","salary"),
+    field(job,"Job Type","JobType"),
+    field(job,"State","state"),
+    field(job,"City","city"),
+    field(job,"Area","area"),
+    field(job,"Landmark","landmark"),
+    field(job,"Job Description","JobDescription","description"),
+    field(job,"Work Type","WorkType"),
+    field(job,"Working Mode","WorkingMode"),
+    field(job,"Working Shifts","WorkingShifts"),
+    field(job,"Gender","gender"),
+    field(job,"Education","education"),
+    field(job,"Experience","experience")
   ].join(" ").toLowerCase();
 
-  const query = normalize(searchInput.value);
-  return (
-    (!query || text.includes(query)) &&
-    (!filterType.value ||
-      field(job, "Job Type", "JobType") === filterType.value) &&
-    (!filterState.value ||
-      field(job, "State", "state") === filterState.value) &&
-    (!filterCity.value ||
-      field(job, "City", "city") === filterCity.value) &&
-    (currentPage !== "saved" || savedIds.includes(item.id))
-  );
+  const search = normalize(searchInput.value);
+
+  return (!search || text.includes(search)) &&
+    (!filterType.value || field(job,"Job Type","JobType") === filterType.value) &&
+    (!filterState.value || field(job,"State","state") === filterState.value) &&
+    (!filterCity.value || field(job,"City","city") === filterCity.value) &&
+    (currentPage !== "saved" || savedIds.includes(item.id));
 }
 
 function jobCard(item) {
   const job = item.data;
   const id = item.id;
-  const title = field(job, "Job Title", "JobTitle", "title") || "Job Vacancy";
-  const company = field(job, "Company Name", "CompanyName", "company") ||
-    "Company not specified";
-  const salary = field(job, "Salary", "salary") || "Not Disclosed";
-  const type = field(job, "Job Type", "JobType") || "-";
-  const area = field(job, "Area", "area");
-  const city = field(job, "City", "city");
-  const state = field(job, "State", "state");
-  const landmark = field(job, "Landmark", "landmark");
-  const workType = field(job, "Work Type", "WorkType") || "-";
-  const mode = field(job, "Working Mode", "WorkingMode") || "-";
-  const shift = field(job, "Working Shifts", "WorkingShifts") || "-";
-  const gender = field(job, "Gender", "gender") || "-";
-  const education = field(job, "Education", "education") || "-";
-  const experience = field(job, "Experience", "experience") || "-";
-  const description = field(job, "Job Description", "JobDescription", "description") || "No description provided.";
-  const phone = field(job, "Contact Number", "ContactNumber", "phone").replace(/[^\d+]/g, "");
-  const whatsappRaw = field(job, "WhatsApp", "Whatsapp", "whatsapp").replace(/\D/g, "");
-  const whatsapp = whatsappRaw
-    ? (whatsappRaw.length === 10 ? "91" + whatsappRaw : whatsappRaw)
-    : "";
-  const email = field(job, "Email", "email");
+  const title = field(job,"Job Title","JobTitle","title") || "Job Vacancy";
+  const company = field(job,"Company Name","CompanyName","company") || "Company not specified";
+  const salary = field(job,"Salary","salary") || "Not Disclosed";
+  const type = field(job,"Job Type","JobType") || "-";
+  const area = field(job,"Area","area");
+  const city = field(job,"City","city");
+  const state = field(job,"State","state");
+  const landmark = field(job,"Landmark","landmark");
+  const workType = field(job,"Work Type","WorkType") || "-";
+  const mode = field(job,"Working Mode","WorkingMode") || "-";
+  const shift = field(job,"Working Shifts","WorkingShifts") || "-";
+  const gender = field(job,"Gender","gender") || "-";
+  const education = field(job,"Education","education") || "-";
+  const experience = field(job,"Experience","experience") || "-";
+  const description = field(job,"Job Description","JobDescription","description") || "No description provided.";
+  const phone = field(job,"Contact Number","ContactNumber","phone").replace(/[^\d+]/g,"");
+  const whatsappRaw = field(job,"WhatsApp","Whatsapp","whatsapp").replace(/\D/g,"");
+  const whatsapp = whatsappRaw ? (whatsappRaw.length === 10 ? "91" + whatsappRaw : whatsappRaw) : "";
+  const email = field(job,"Email","email");
   const saved = savedIds.includes(id);
   const expanded = expandedIds.has(id);
-
-  const location = [area, city, state].filter(Boolean).join(", ") || "Not specified";
-  const shareUrl = locationUrl(id);
+  const location = [area,city,state].filter(Boolean).join(", ") || "Not specified";
 
   return `
   <article class="job" id="job-${esc(id)}">
     <div class="jobTop">
       <div class="jobTitle">${esc(title)}</div>
       <div class="actions">
-        <button class="iconBtn ${saved ? "saved" : ""}"
-          data-action="save" data-id="${esc(id)}"
-          aria-label="Save job">
+        <button class="iconBtn ${saved ? "saved" : ""}" data-action="save" data-id="${esc(id)}" aria-label="Save job">
           <i class="${saved ? "fa-solid" : "fa-regular"} fa-bookmark"></i>
         </button>
-        <button class="iconBtn" data-action="share"
-          data-id="${esc(id)}" aria-label="Share job">
+        <button class="iconBtn" data-action="share" data-id="${esc(id)}" aria-label="Share job">
           <i class="fa-solid fa-share-nodes"></i>
         </button>
       </div>
     </div>
-
-    <div class="company"><i class="fa-regular fa-building"></i>
-      ${esc(company)}</div>
+    <div class="company"><i class="fa-regular fa-building"></i> ${esc(company)}</div>
     <div class="salary">₹ ${esc(salary)}</div>
-    <div class="info"><i class="fa-solid fa-briefcase"></i>
-      <b>Job Type:</b> ${esc(type)}</div>
-    <div class="info"><i class="fa-solid fa-location-dot"></i>
-      <b>Location:</b> ${esc(location)}</div>
-    <div class="info"><i class="fa-solid fa-map-pin"></i>
-      <b>Landmark:</b> ${esc(landmark || "-")}</div>
+    <div class="info"><i class="fa-solid fa-briefcase"></i> <b>Job Type:</b> ${esc(type)}</div>
+    <div class="info"><i class="fa-solid fa-location-dot"></i> <b>Location:</b> ${esc(location)}</div>
+    <div class="info"><i class="fa-solid fa-map-pin"></i> <b>Landmark:</b> ${esc(landmark || "-")}</div>
 
     <div class="details ${expanded ? "show" : ""}" id="details-${esc(id)}">
       <div class="info"><b>Work Type:</b> ${esc(workType)}</div>
@@ -461,26 +322,17 @@ function jobCard(item) {
       <div class="description"><b>Description:</b>
 ${esc(description)}</div>
       <div class="contact">
-        ${phone ? `<a class="call" href="tel:${esc(phone)}">
-          <i class="fa-solid fa-phone"></i> Call</a>` : ""}
-        ${whatsapp ? `<a class="whatsapp"
-          href="https://wa.me/${esc(whatsapp)}" target="_blank"
-          rel="noopener noreferrer">
-          <i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ""}
-        ${email ? `<a class="email" href="mailto:${esc(email)}">
-          <i class="fa-solid fa-envelope"></i> Email</a>` : ""}
+        ${phone ? `<a class="call" href="tel:${esc(phone)}"><i class="fa-solid fa-phone"></i> Call</a>` : ""}
+        ${whatsapp ? `<a class="whatsapp" href="https://wa.me/${esc(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : ""}
+        ${email ? `<a class="email" href="mailto:${esc(email)}"><i class="fa-solid fa-envelope"></i> Email</a>` : ""}
       </div>
     </div>
-
-    <button class="readBtn" data-action="details" data-id="${esc(id)}">
-      ${expanded ? "Read Less" : "Read More"}
-    </button>
+    <button class="readBtn" data-action="details" data-id="${esc(id)}">${expanded ? "Read Less" : "Read More"}</button>
   </article>`;
 }
 
 function locationUrl(id) {
-  return window.location.origin + window.location.pathname +
-    "#job-" + encodeURIComponent(id);
+  return window.location.origin + window.location.pathname + "#job-" + encodeURIComponent(id);
 }
 
 function renderJobs() {
@@ -490,8 +342,8 @@ function renderJobs() {
   if (!visible.length) {
     jobsBox.innerHTML = "";
     message.style.display = "block";
-    message.innerHTML = currentPage === "saved" && !savedIds.length
-      ? 'No saved jobs yet. Tap the bookmark icon on a job to save it.'
+    message.textContent = currentPage === "saved" && !savedIds.length
+      ? "No saved jobs yet. Tap the bookmark icon on a job to save it."
       : "No jobs found. Try another search or reset the filters.";
     return;
   }
@@ -508,9 +360,7 @@ jobsBox.addEventListener("click", async event => {
   const action = button.dataset.action;
 
   if (action === "save") {
-    savedIds = savedIds.includes(id)
-      ? savedIds.filter(savedId => savedId !== id)
-      : [...savedIds, id];
+    savedIds = savedIds.includes(id) ? savedIds.filter(savedId => savedId !== id) : [...savedIds,id];
     saveSaved();
     updateSavedCount();
     renderJobs();
@@ -524,78 +374,84 @@ jobsBox.addEventListener("click", async event => {
 
   if (action === "share") {
     const item = allJobs.find(job => job.id === id);
-    const title = item
-      ? field(item.data, "Job Title", "JobTitle", "title") || "Job Vacancy"
-      : "Work Finder Job";
-
+    const title = item ? field(item.data,"Job Title","JobTitle","title") || "Job Vacancy" : "Work Finder Job";
     const url = locationUrl(id);
+
     try {
       if (navigator.share) {
-        await navigator.share({ title, text: "Check this job on Work Finder", url });
+        await navigator.share({title,text:"Check this job on Work Finder",url});
       } else if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(url);
         alert("Job link copied!");
       } else {
-        prompt("Copy this job link:", url);
+        prompt("Copy this job link:",url);
       }
     } catch (error) {
-      if (error.name !== "AbortError") {
-        prompt("Copy this job link:", url);
-      }
+      if (error.name !== "AbortError") prompt("Copy this job link:",url);
     }
   }
 });
 
+/*
+ * IMPORTANT FIX:
+ * Query Firestore for public jobs only.
+ * Firestore Rules are not filters, so reading the entire collection
+ * can fail with permission-denied even when some jobs are approved.
+ *
+ * These conditions must match your Firestore Rules:
+ * status == "approved"
+ * editPending == false
+ */
 async function loadJobs() {
   try {
     message.style.display = "block";
     message.innerHTML = '<div class="spinner"></div>Loading jobs from Firebase...';
+    jobsBox.innerHTML = "";
 
-    const snapshot = await getDocs(collection(db, "jobs"));
+    const publicJobsQuery = query(
+      collection(db, "jobs"),
+      where("status", "==", "approved"),
+      where("editPending", "==", false)
+    );
 
-    allJobs = [];
-    snapshot.forEach(documentSnapshot => {
-      const data = documentSnapshot.data();
-      const status = normalize(data.status);
+    const snapshot = await getDocs(publicJobsQuery);
 
-      // Only approved jobs are public
-      if (status === "approved") {
-        allJobs.push({ id: documentSnapshot.id, data });
-      }
-    });
+    allJobs = snapshot.docs.map(documentSnapshot => ({
+      id: documentSnapshot.id,
+      data: documentSnapshot.data()
+    }));
 
     fillSelect(filterType,
-      allJobs.map(item => field(item.data, "Job Type", "JobType")),
+      allJobs.map(item => field(item.data,"Job Type","JobType")),
       "All Job Types");
 
     fillSelect(filterState,
-      allJobs.map(item => field(item.data, "State", "state")),
+      allJobs.map(item => field(item.data,"State","state")),
       "All States");
 
     fillSelect(filterCity,
-      allJobs.map(item => field(item.data, "City", "city")),
+      allJobs.map(item => field(item.data,"City","city")),
       "All Cities");
 
     updateSavedCount();
     renderJobs();
 
   } catch (error) {
-    console.error("Firebase job loading error:", error);
+    console.error("Firebase job loading error:",error);
     jobsBox.innerHTML = "";
     countBox.textContent = "";
     message.style.display = "block";
     message.innerHTML = `
       <b style="color:#dc2626">Unable to load jobs</b>
       <p>Firebase se data load nahi hua.</p>
-      <p style="font-size:13px;overflow-wrap:anywhere">
-        ${esc(error.code || error.message || "Unknown error")}
-      </p>
+      <p style="font-size:13px;overflow-wrap:anywhere">${esc(error.code || error.message || "Unknown error")}</p>
       <button id="retryBtn" class="readBtn">Try Again</button>
     `;
-    document.getElementById("retryBtn").addEventListener("click", loadJobs);
+    document.getElementById("retryBtn").addEventListener("click",loadJobs);
   }
 }
 
+updateSavedCount();
 loadJobs();
 </script>
 </body>

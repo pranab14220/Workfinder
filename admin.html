@@ -167,9 +167,16 @@ hr{border:0;border-top:1px solid #e2e8f0;margin:13px 0}
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
+
 import {
-  getFirestore, collection, doc, updateDoc,
-  onSnapshot, serverTimestamp
+  getFirestore,
+  collection,
+  doc,
+  updateDoc,
+  onSnapshot,
+  serverTimestamp,
+  writeBatch,
+  deleteField
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {

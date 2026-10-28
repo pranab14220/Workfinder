@@ -1,0 +1,531 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f172a">
+<title>Work Finder - Admin</title>
+
+<link rel="stylesheet"
+ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;background:#e2e8f0;color:#0f172a;
+  font-family:Arial,"Segoe UI",sans-serif
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{max-width:650px;min-height:100vh;margin:auto;background:#f8fafc}
+.header{
+  background:#0f172a;color:white;padding:17px;
+  position:sticky;top:0;z-index:5;
+  display:flex;align-items:center;justify-content:space-between;gap:10px
+}
+.logo{font-size:20px;font-weight:bold}
+.header button{
+  background:#1e293b;color:white;border:0;
+  border-radius:8px;padding:10px
+}
+main{padding:14px}
+h2{font-size:19px;margin:8px 0 15px}
+.muted{color:#64748b;font-size:13px;line-height:1.6}
+.login{
+  margin:30px auto;background:white;padding:22px;
+  border:1px solid #e2e8f0;border-radius:14px
+}
+.login input{
+  display:block;width:100%;padding:13px;margin:12px 0;
+  border:1px solid #cbd5e1;border-radius:8px
+}
+.primary,.approve,.reject{
+  border:0;border-radius:8px;padding:12px;
+  color:white;font-weight:bold
+}
+.primary{background:#0f172a;width:100%}
+.tabs{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;margin-bottom:18px
+}
+.tab{
+  background:white;border:1px solid #cbd5e1;
+  border-radius:10px;padding:12px 4px;
+  color:#334155;font-size:13px;font-weight:bold
+}
+.tab.active{background:#0f172a;color:white;border-color:#0f172a}
+.count{
+  display:inline-block;min-width:21px;padding:3px 5px;
+  margin-left:3px;border-radius:20px;background:#ef4444;color:white
+}
+.tab.active .count{background:white;color:#0f172a}
+.job{
+  background:white;border:1px solid #e2e8f0;
+  border-radius:14px;padding:15px;margin-bottom:14px;
+  box-shadow:0 4px 12px #0f172a0b
+}
+.jobTop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.jobTitle{font-size:19px;font-weight:bold;overflow-wrap:anywhere}
+.company{color:#475569;font-size:14px;margin-top:7px}
+.salary{font-size:19px;font-weight:bold;color:#16a34a;margin:12px 0}
+.status{
+  display:inline-block;padding:5px 9px;border-radius:20px;
+  font-size:12px;font-weight:bold;white-space:nowrap
+}
+.pending{background:#fef3c7;color:#92400e}
+.approved{background:#dcfce7;color:#166534}
+.rejected{background:#fee2e2;color:#991b1b}
+.info{
+  font-size:14px;line-height:1.6;color:#334155;
+  margin:8px 0;overflow-wrap:anywhere
+}
+.info b{color:#0f172a}
+.description{
+  white-space:pre-wrap;overflow-wrap:anywhere;
+  font-size:14px;line-height:1.6;color:#475569;margin-top:10px
+}
+hr{border:0;border-top:1px solid #e2e8f0;margin:13px 0}
+.buttons{display:flex;gap:9px;margin-top:15px}
+.buttons button{flex:1}
+.approve{background:#16a34a}
+.reject{background:#dc2626}
+.empty{
+  background:white;border:1px solid #e2e8f0;border-radius:12px;
+  padding:30px 15px;text-align:center;color:#64748b;line-height:1.7
+}
+#error{color:#dc2626;overflow-wrap:anywhere;font-size:13px}
+#notice{
+  padding:11px;border-radius:8px;background:#e0f2fe;
+  color:#075985;margin-bottom:12px;font-size:13px;display:none
+}
+.footer{text-align:center;padding:22px;color:#94a3b8;font-size:12px}
+[hidden]{display:none!important}
+@media(max-width:360px){
+  main{padding:10px}.job{padding:12px}
+  .jobTitle{font-size:17px}.tab{font-size:12px}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header class="header">
+  <div class="logo">
+    <i class="fa-solid fa-briefcase"></i> Work Finder Admin
+  </div>
+  <button id="logoutBtn" hidden>
+    <i class="fa-solid fa-right-from-bracket"></i> Logout
+  </button>
+</header>
+
+<main>
+  <section id="loginSection" class="login">
+    <h2>Admin Login</h2>
+    <p class="muted">Sirf authorized administrator login kar sakta hai.</p>
+
+    <form id="loginForm">
+      <input id="email" type="email" placeholder="Admin email"
+        autocomplete="username" required>
+      <input id="password" type="password" placeholder="Password"
+        autocomplete="current-password" required>
+      <button class="primary" type="submit">Login</button>
+    </form>
+    <p id="error" role="alert"></p>
+  </section>
+
+  <section id="dashboard" hidden>
+    <h2>Job Approval Dashboard</h2>
+    <p class="muted">Jobs ko check karke approve ya reject karo.</p>
+
+    <div id="notice"></div>
+
+    <nav class="tabs">
+      <button class="tab active" data-section="pending">
+        Pending <span class="count" id="pendingCount">0</span>
+      </button>
+      <button class="tab" data-section="approved">
+        Approved <span id="approvedCount">0</span>
+      </button>
+      <button class="tab" data-section="rejected">
+        Rejected <span id="rejectedCount">0</span>
+      </button>
+    </nav>
+
+    <div id="sectionTitle"><h2>Pending Jobs</h2></div>
+    <div id="jobs">
+      <div class="empty">Loading jobs...</div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">Work Finder · Admin Panel</footer>
+</div>
+
+<script type="module">
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getFirestore, collection, doc, updateDoc,
+  onSnapshot, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+  getAuth, signInWithEmailAndPassword,
+  onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+/* Firebase configuration: same project as your job website */
+const firebaseConfig = {
+  apiKey: "AIzaSyCCBMrDXwhV8-2kz-FaMTYmLEODXRGNAdU",
+  authDomain: "workfinder2-a5f80.firebaseapp.com",
+  projectId: "workfinder2-a5f80"
+};
+
+/* Replace this with your actual Firebase Auth user UID */
+const ADMIN_UID = "PASTE_YOUR_ADMIN_UID_HERE";
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const loginSection = document.getElementById("loginSection");
+const dashboard = document.getElementById("dashboard");
+const loginForm = document.getElementById("loginForm");
+const errorBox = document.getElementById("error");
+const jobsBox = document.getElementById("jobs");
+const notice = document.getElementById("notice");
+
+let jobs = [];
+let currentSection = "pending";
+let unsubscribeJobs = null;
+let busy = false;
+
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+
+function field(job, ...names) {
+  for (const name of names) {
+    const value = job[name];
+    if (value !== undefined && value !== null &&
+        String(value).trim() !== "") {
+      return String(value).trim();
+    }
+  }
+  return "";
+}
+
+/* Support common old status spellings */
+function statusOf(job) {
+  const s = field(job, "status").toLowerCase();
+  if (["approved", "yes"].includes(s)) return "approved";
+  if (s === "rejected") return "rejected";
+  return "pending";
+}
+
+function displayValue(value) {
+  if (value === null || value === undefined) return "";
+  if (typeof value?.toDate === "function") {
+    return value.toDate().toLocaleString();
+  }
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
+function labelOf(key) {
+  return key.replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[_-]/g, " ")
+    .replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function showNotice(message) {
+  notice.textContent = message;
+  notice.style.display = "block";
+}
+
+function hideNotice() {
+  notice.style.display = "none";
+}
+
+function setCounts() {
+  const count = section =>
+    jobs.filter(item => statusOf(item.data) === section).length;
+
+  document.getElementById("pendingCount").textContent = count("pending");
+  document.getElementById("approvedCount").textContent = count("approved");
+  document.getElementById("rejectedCount").textContent = count("rejected");
+}
+
+function makeCard(item) {
+  const job = item.data;
+  const id = item.id;
+  const status = statusOf(job);
+
+  const title = field(job, "Job Title", "JobTitle", "title") || "Job Vacancy";
+  const company = field(job, "Company Name", "CompanyName", "company")
+    || "Company not specified";
+  const salary = field(job, "Salary", "salary") || "Not Disclosed";
+
+  const area = field(job, "Area", "area");
+  const city = field(job, "City", "city");
+  const state = field(job, "State", "state");
+  const location = [area, city, state].filter(Boolean).join(", ")
+    || "Not specified";
+
+  const known = new Set([
+    "Job Title", "JobTitle", "title",
+    "Company Name", "CompanyName", "company",
+    "Salary", "salary",
+    "status", "reviewedAt"
+  ]);
+
+  /* Show all stored fields, including any extra fields */
+  const extraFields = Object.entries(job)
+    .filter(([key]) => !known.has(key))
+    .map(([key, value]) => `
+      <div class="info">
+        <b>${esc(labelOf(key))}:</b>
+        ${esc(displayValue(value) || "-")}
+      </div>
+    `).join("");
+
+  return `
+  <article class="job">
+    <div class="jobTop">
+      <div class="jobTitle">${esc(title)}</div>
+      <span class="status ${status}">${esc(status.toUpperCase())}</span>
+    </div>
+
+    <div class="company">
+      <i class="fa-regular fa-building"></i> ${esc(company)}
+    </div>
+    <div class="salary">₹ ${esc(salary)}</div>
+
+    <div class="info">
+      <b>Job Type:</b> ${esc(field(job,"Job Type","JobType") || "-")}
+    </div>
+    <div class="info">
+      <b>Location:</b> ${esc(location)}
+    </div>
+    <div class="info">
+      <b>Landmark:</b> ${esc(field(job,"Landmark","landmark") || "-")}
+    </div>
+
+    <hr>
+    <div class="info">
+      <b>Work Type:</b> ${esc(field(job,"Work Type","WorkType") || "-")}
+    </div>
+    <div class="info">
+      <b>Working Mode:</b> ${esc(field(job,"Working Mode","WorkingMode") || "-")}
+    </div>
+    <div class="info">
+      <b>Working Shifts:</b> ${esc(field(job,"Working Shifts","WorkingShifts") || "-")}
+    </div>
+    <div class="info">
+      <b>Gender:</b> ${esc(field(job,"Gender","gender") || "-")}
+    </div>
+    <div class="info">
+      <b>Education:</b> ${esc(field(job,"Education","education") || "-")}
+    </div>
+    <div class="info">
+      <b>Experience:</b> ${esc(field(job,"Experience","experience") || "-")}
+    </div>
+    <div class="description"><b>Job Description:</b>
+${esc(field(job,"Job Description","JobDescription","description") || "No description provided.")}</div>
+
+    <hr>
+    <div class="info">
+      <b>Contact Number:</b> ${esc(field(job,"Contact Number","ContactNumber","phone") || "-")}
+    </div>
+    <div class="info">
+      <b>WhatsApp:</b> ${esc(field(job,"WhatsApp","Whatsapp","whatsapp") || "-")}
+    </div>
+    <div class="info">
+      <b>Email:</b> ${esc(field(job,"Email","email") || "-")}
+    </div>
+
+    ${extraFields ? `<hr><h3 style="font-size:15px">Other Job Details</h3>${extraFields}` : ""}
+
+    ${status === "pending" ? `
+      <div class="buttons">
+        <button class="approve" data-action="approve" data-id="${esc(id)}">
+          <i class="fa-solid fa-check"></i> Approve
+        </button>
+        <button class="reject" data-action="reject" data-id="${esc(id)}">
+          <i class="fa-solid fa-xmark"></i> Reject
+        </button>
+      </div>
+    ` : ""}
+  </article>`;
+}
+
+function renderJobs() {
+  setCounts();
+
+  document.getElementById("sectionTitle").innerHTML =
+    `<h2>${labelOf(currentSection)} Jobs</h2>`;
+
+  document.querySelectorAll(".tab").forEach(button => {
+    button.classList.toggle(
+      "active", button.dataset.section === currentSection
+    );
+  });
+
+  const visible = jobs.filter(item =>
+    statusOf(item.data) === currentSection
+  );
+
+  if (!visible.length) {
+    jobsBox.innerHTML = `
+      <div class="empty">
+        <i class="fa-solid fa-briefcase" style="font-size:25px"></i>
+        <p>No ${esc(currentSection)} jobs found.</p>
+      </div>`;
+    return;
+  }
+
+  jobsBox.innerHTML = visible.map(makeCard).join("");
+}
+
+function startJobsListener() {
+  if (unsubscribeJobs) unsubscribeJobs();
+
+  jobsBox.innerHTML = '<div class="empty">Loading jobs...</div>';
+
+  unsubscribeJobs = onSnapshot(
+    collection(db, "jobs"),
+    snapshot => {
+      jobs = snapshot.docs.map(d => ({
+        id: d.id,
+        data: d.data()
+      }));
+      hideNotice();
+      renderJobs();
+    },
+    error => {
+      console.error(error);
+      jobsBox.innerHTML = `
+        <div class="empty">
+          Unable to load jobs.<br>
+          Check Firestore Rules and admin permissions.
+          <p>${esc(error.code || error.message)}</p>
+        </div>`;
+    }
+  );
+}
+
+async function changeStatus(id, nextStatus) {
+  if (busy) return;
+
+  const item = jobs.find(job => job.id === id);
+  if (!item || statusOf(item.data) !== "pending") {
+    showNotice("Yeh job ab Pending mein nahi hai. List refresh ho jayegi.");
+    return;
+  }
+
+  const title = field(item.data, "Job Title", "JobTitle", "title")
+    || "this job";
+
+  const message = nextStatus === "approved"
+    ? `Approve "${title}"? It can appear on the public website.`
+    : `Reject "${title}"? It will not appear on the public website.`;
+
+  if (!confirm(message)) return;
+
+  busy = true;
+  jobsBox.querySelectorAll("button[data-action]").forEach(b => b.disabled = true);
+
+  try {
+    await updateDoc(doc(db, "jobs", id), {
+      status: nextStatus,
+      reviewedAt: serverTimestamp()
+    });
+
+    showNotice(`Job ${nextStatus} successfully.`);
+    // onSnapshot automatically updates sections and counts
+  } catch (error) {
+    console.error(error);
+    showNotice("Update failed: " + (error.code || error.message));
+  } finally {
+    busy = false;
+    renderJobs();
+  }
+}
+
+document.querySelectorAll(".tab").forEach(button => {
+  button.addEventListener("click", () => {
+    currentSection = button.dataset.section;
+    renderJobs();
+    window.scrollTo({top: 0, behavior: "smooth"});
+  });
+});
+
+jobsBox.addEventListener("click", event => {
+  const button = event.target.closest("button[data-action]");
+  if (!button) return;
+
+  const action = button.dataset.action;
+  const nextStatus = action === "approve" ? "approved" : "rejected";
+
+  if (["approve", "reject"].includes(action)) {
+    changeStatus(button.dataset.id, nextStatus);
+  }
+});
+
+loginForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  errorBox.textContent = "";
+
+  if (ADMIN_UID === "PASTE_YOUR_ADMIN_UID_HERE") {
+    errorBox.textContent = "Pehle code mein apna Firebase Admin UID set karo.";
+    return;
+  }
+
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      document.getElementById("email").value.trim(),
+      document.getElementById("password").value
+    );
+  } catch (error) {
+    errorBox.textContent = "Login failed: " + (error.code || error.message);
+  }
+});
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  if (unsubscribeJobs) unsubscribeJobs();
+  unsubscribeJobs = null;
+  await signOut(auth);
+});
+
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    if (unsubscribeJobs) unsubscribeJobs();
+    unsubscribeJobs = null;
+    dashboard.hidden = true;
+    loginSection.hidden = false;
+    document.getElementById("logoutBtn").hidden = true;
+    return;
+  }
+
+  if (ADMIN_UID === "PASTE_YOUR_ADMIN_UID_HERE" ||
+      user.uid !== ADMIN_UID) {
+    await signOut(auth);
+    errorBox.textContent = "Is account ko Admin access nahi hai.";
+    return;
+  }
+
+  loginSection.hidden = true;
+  dashboard.hidden = false;
+  document.getElementById("logoutBtn").hidden = false;
+  startJobsListener();
+});
+</script>
+</body>
+</html>
